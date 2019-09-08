@@ -1,0 +1,25 @@
+version: '3'
+services:
+  web:
+    image: newdeveloper/apache-php
+    volumes:
+      - ./:/var/www/html/framework
+      - ./docker/etc/apache/default.conf:/etc/apache2/sites-available/000-default.conf
+      - ./docker/etc/php/php.ini:/etc/php/7.2/apache2/conf.d/php.ini
+    ports:
+      - 80:80
+    depends_on:
+      - db
+  db:
+    image: mysql:5.7
+    restart: always
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: simplechat
+      MYSQL_USER: simplechat
+      MYSQL_PASSWORD: simplechat
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+

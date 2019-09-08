@@ -1,7 +1,5 @@
 <?php
 
-use Framework\Router\Router;
-
 return [
     'db.host' => 'localhost',
     'db.port' => 3336,
