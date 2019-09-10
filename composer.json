@@ -4,7 +4,8 @@
     "require": {
         "guzzlehttp/psr7": "^1.6",
         "http-interop/response-sender": "^1.0",
-        "php-di/php-di": "^6.0"
+        "php-di/php-di": "^6.0",
+        "twig/twig": "^2.11"
     },
     "autoload": {
         "psr-4": {
