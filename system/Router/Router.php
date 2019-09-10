@@ -8,6 +8,7 @@
 namespace Framework\Router;
 
 use Exception;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -60,6 +61,13 @@ class Router
      */
 
     private $numHandled;
+
+    /**
+     * DI/container
+     *
+     * @var Container
+     */
+    private $container;
 
     public function before($methods, $pattern, $fn)
     {
@@ -278,8 +286,9 @@ class Router
      *
      * @return bool
      */
-    public function run(ServerRequestInterface $request,$callback = null): ResponseInterface
+    public function run(ServerRequestInterface $request,ContainerInterface $container, $callback = null): ResponseInterface
     {
+        $this->container = $container;
         // Define which method we need to handle
         $this->requestedMethod = $this->getRequestMethod();
 
@@ -294,7 +303,7 @@ class Router
         }
 
         // If no route was handled, trigger the 404 (if any)
-        if ($this->numHandled === 0) {
+        if ($this->numHandled === 0 || $this->numHandled === null) {
             if ($this->notFoundCallback) {
                 return $this->invoke($request, $this->notFoundCallback);
             } else {
@@ -379,7 +388,7 @@ class Router
         return $response;
     }
 
-    private function invoke(ServerRequestInterface $request, $fn, $params = []) : ResponseInterface
+    private function invoke(ServerRequestInterface $request, $fn, $params = [])
     {
         array_unshift($params, $request);
         if (is_callable($fn)) {
@@ -400,7 +409,7 @@ class Router
             if (class_exists($controller)) {
                 // First check if is a static method, directly trying to invoke it.
                 // If isn't a valid static method, we will try as a normal method invocation.
-                return call_user_func_array([new $controller(), $method], $params);
+                return call_user_func_array([new $controller($this->container), $method], $params);
             }
             else{
                 throw new \Exception("Class: " . $controller. " Not found");
