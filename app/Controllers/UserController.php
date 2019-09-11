@@ -11,12 +11,11 @@ class UserController extends BaseController
     private $key = "example";
 
     public function register(Request $request){
-        $post = $request->getQueryParams();
 
         $user = new User();
-        $user->setEmail($post['email']);
-        $user->setPseudo($post['username']);
-        $user->setPassword($post['pass']);
+        $user->setEmail($this->getRequestBody($request, 'email'));
+        $user->setPseudo($this->getRequestBody($request, 'username'));
+        $user->setPassword($this->getRequestBody($request, 'pass'));
         $user->setActif(true);
 
         $exist = $user->isEmailExists();
@@ -48,11 +47,10 @@ class UserController extends BaseController
     }
 
     public function login(Request $request){
-        $post = $request->getQueryParams();
-
+    
         $user = new User();
-        $user->setEmail($post['email']);
-        $user->setPassword($post['pass']);
+        $user->setEmail($this->getRequestBody($request,'email'));
+        $user->setPassword($this->getRequestBody($request,'pass'));
 
         $exist = $user->isUserExists();
         $status = "error";
