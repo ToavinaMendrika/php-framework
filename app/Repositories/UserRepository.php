@@ -77,7 +77,6 @@ class UserRepository extends UserEntity{
 		$this->setPhoto_profil($user['password']);
 		$this->setActif($user['actif']);
 		$this->setDate_last_modification($user['date_last_modification']);
-		$this->setToken($user['token']);
 
 		return $this;
 	}
@@ -98,8 +97,7 @@ class UserRepository extends UserEntity{
 			photo_profil = :photo_profil,
 			bio = :bio,
 			actif = :actif,
-			date_last_modification = NOW(),
-			token = :token
+			date_last_modification = NOW()
 			WHERE id = :id
 		");
 		$req -> execute(array(
@@ -110,7 +108,6 @@ class UserRepository extends UserEntity{
 			"photo_profil" => $this -> getPhoto_profil(),
 			"bio" => $this -> getBio(),
 			"actif" => $this -> getActif(),
-			"token" => $this -> getToken(),
 		));
 	}
 

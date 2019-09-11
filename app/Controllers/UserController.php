@@ -32,8 +32,6 @@ class UserController extends BaseController
             );
             $key = $this->key;
             $jwt = $this->getEncodeJwt($userData, $key);
-            $user->setToken($jwt);
-            $user->update();
 
             $status = "success";
             $token = $jwt;
@@ -69,9 +67,7 @@ class UserController extends BaseController
             );
             $key = $this->key;
             $jwt = $this->getEncodeJwt($userData, $key);
-            $user->setToken($jwt);
-            $user->update();
-
+            
             $status = "success";
             $token = $jwt;
         }
