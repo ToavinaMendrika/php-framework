@@ -1,14 +1,25 @@
 <?php
 namespace App\Controllers;
 
-use GuzzleHttp\Psr7\Response;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Framework\Controller\BaseController;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
-class BlogController
+class BlogController extends BaseController
 {
-    public function index(ServerRequestInterface $request): ResponseInterface
+    public function index(Request $request)
     {
-        return new Response(200, [], '<h1>Bienvenue sur le blog</h1>');
+        return $this->render('blog/index',["variable"=>"test"]);
+    }
+
+    public function show(Request $request, int $id , string $slug)
+    {
+        return $this->renderJson(["id"=>$id]);
+    }
+
+    public function create(Request $request)
+    {      
+        //$method = $request->getMethod();
+        $data = $request->getParsedBody();
+        return $this->renderJson($data);
     }
 }
