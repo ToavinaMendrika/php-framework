@@ -3,6 +3,8 @@
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+
+$router->get('/','PageController@index');
 $router->get('/blog','BlogController@index');
 $router->get('/blog/{id}/{slug}','BlogController@show');
 

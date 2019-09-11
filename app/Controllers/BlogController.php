@@ -13,9 +13,7 @@ class BlogController extends BaseController
 
     public function show(Request $request, int $id , string $slug)
     {
-        $user = $this->container->get(User::class);
-        $userre = $this->container->get(Rep::class);
-        $userre->save($user);
+        
         return $this->renderJson(["id"=>$id]);
     }
 
