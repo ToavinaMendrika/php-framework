@@ -13,13 +13,6 @@ class BlogController extends BaseController
 
     public function show(Request $request, int $id , string $slug)
     {
-        return $this->renderJson(["id"=>$id]);
-    }
-
-    public function create(Request $request)
-    {      
-        //$method = $request->getMethod();
-        $data = $request->getParsedBody();
-        return $this->renderJson($data);
+        
     }
 }
