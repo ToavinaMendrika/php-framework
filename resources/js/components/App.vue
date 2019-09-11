@@ -1,10 +1,15 @@
 <template>
     <div>
-        <h1>App Component</h1>
+        <register/>    
     </div>
 </template>
 <script>
+import Register from './pages/Register.vue'
 export default {
+
+    components: {
+        Register
+    }
 
 }
 </script>
