@@ -6,6 +6,7 @@ use Framework\Renderer\RendererInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class BaseController
 {
@@ -29,6 +30,16 @@ class BaseController
         return new Response(200,[
             'Content-Type' => 'application/json'
         ],json_encode($data));
+    }
+
+    public function getRequestBody(ServerRequestInterface $request, string $key)
+    {
+        if(isset($request->getParsedBody()[$key])){
+            return $request->getParsedBody()[$key];
+        }
+        else{
+            return $request->getQueryParams()[$key];
+        }
     }
 
 }
