@@ -21,6 +21,8 @@ class App
 
     public function run(ServerRequestInterface $request):ResponseInterface
     {
+        $dotenv = \Dotenv\Dotenv::create(ROOT_DIRECTORY);
+        $dotenv->load();
         $this->router = $this->container->get(Router::class);
         $this->router->setNamespace($this->container->get('app.controller'));
         $this->router->getAppRoutes($this->router,$this->container->get('app.router'));

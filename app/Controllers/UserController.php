@@ -8,7 +8,6 @@ use Firebase\JWT\JWT;
 
 class UserController extends BaseController
 {
-    private $key = "example";
 
     public function register(Request $request){
 
@@ -29,8 +28,7 @@ class UserController extends BaseController
             $userData = array(
                 "id" => $id,
             );
-            $key = $this->key;
-            $jwt = $this->getEncodeJwt($userData, $key);
+            $jwt = $this->getEncodeJwt($userData, getenv('APP_KEY'));
 
             $status = "success";
             $token = $jwt;
@@ -63,8 +61,8 @@ class UserController extends BaseController
             $userData = array(
                 "id" => $id,
             );
-            $key = $this->key;
-            $jwt = $this->getEncodeJwt($userData, $key);
+
+            $jwt = $this->getEncodeJwt($userData, getenv('APP_KEY'));
             
             $status = "success";
             $token = $jwt;
