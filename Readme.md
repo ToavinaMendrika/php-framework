@@ -16,6 +16,12 @@
     composer install
     ```
 
+    Configuration
+    ```
+    cp .env.exemple .env
+    ```
+    Remplire la configuration dans .env avec la configuration de la base de donnée
+
     demarer le serveur
     ```
     php -S localhost:8000 -t public/

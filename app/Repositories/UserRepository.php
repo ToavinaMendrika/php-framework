@@ -3,13 +3,13 @@
 namespace App\Repositories;
 
 use App\Models\UserEntity;
-use \PDO;
+use Framework\Database\Connection;
 
 class UserRepository extends UserEntity{
 	private $db = null;
 
 	function __construct(){
-		$this->setDb();
+		$this->db = Connection::getPDO();
 	}
 
 	public function isEmailExists(){
@@ -77,7 +77,6 @@ class UserRepository extends UserEntity{
 		$this->setPhoto_profil($user['password']);
 		$this->setActif($user['actif']);
 		$this->setDate_last_modification($user['date_last_modification']);
-		$this->setToken($user['token']);
 
 		return $this;
 	}
@@ -98,8 +97,7 @@ class UserRepository extends UserEntity{
 			photo_profil = :photo_profil,
 			bio = :bio,
 			actif = :actif,
-			date_last_modification = NOW(),
-			token = :token
+			date_last_modification = NOW()
 			WHERE id = :id
 		");
 		$req -> execute(array(
@@ -110,21 +108,7 @@ class UserRepository extends UserEntity{
 			"photo_profil" => $this -> getPhoto_profil(),
 			"bio" => $this -> getBio(),
 			"actif" => $this -> getActif(),
-			"token" => $this -> getToken(),
 		));
 	}
 
-	private function setDb(){
-		$host = "localhost";
-		$db_name = "simple_chat";
-		$login = "root";
-		$password = "";
-
-		$info = "mysql:host=" . $host . ";dbname=" . $db_name;
-		$login = $login;
-		$password = $password;
-
-		$bdd = new PDO($info, $login, $password);
-		$this->db = $bdd;
-	}
 }

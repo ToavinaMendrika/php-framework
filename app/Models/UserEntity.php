@@ -21,8 +21,6 @@ class UserEntity {
 
 	private $date_last_modification;
 
-	private $token;
-
 	public function getId(){
 		return $this->id;
 	}
@@ -93,13 +91,5 @@ class UserEntity {
 
 	public function setDate_last_modification($date_last_modification){
 		$this->date_last_modification = $date_last_modification;
-	}
-
-	public function getToken(){
-		return $this->token;
-	}
-
-	public function setToken($token){
-		$this->token = $token;
 	}
 }
