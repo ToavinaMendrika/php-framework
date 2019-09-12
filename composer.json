@@ -6,7 +6,8 @@
         "http-interop/response-sender": "^1.0",
         "php-di/php-di": "^6.0",
         "twig/twig": "^2.11",
-        "firebase/php-jwt": "^5.0"
+        "firebase/php-jwt": "^5.0",
+        "vlucas/phpdotenv": "^3.6"
     },
     "autoload": {
         "psr-4": {

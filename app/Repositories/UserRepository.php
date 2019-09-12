@@ -3,13 +3,13 @@
 namespace App\Repositories;
 
 use App\Models\UserEntity;
-use \PDO;
+use Framework\Database\Connection;
 
 class UserRepository extends UserEntity{
 	private $db = null;
 
 	function __construct(){
-		$this->setDb();
+		$this->db = Connection::getPDO();
 	}
 
 	public function isEmailExists(){
@@ -110,17 +110,4 @@ class UserRepository extends UserEntity{
 		));
 	}
 
-	private function setDb(){
-		$host = "localhost";
-		$db_name = "simple_chat";
-		$login = "root";
-		$password = "";
-
-		$info = "mysql:host=" . $host . ";dbname=" . $db_name;
-		$login = $login;
-		$password = $password;
-
-		$bdd = new PDO($info, $login, $password);
-		$this->db = $bdd;
-	}
 }

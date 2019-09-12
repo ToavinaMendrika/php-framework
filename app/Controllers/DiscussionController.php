@@ -5,6 +5,7 @@ use Framework\Controller\BaseController;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Repositories\DiscussionRepository as Discussion;
 use Firebase\JWT\JWT;
+use GuzzleHttp\Psr7\Response;
 
 class DiscussionController extends BaseController
 {
@@ -12,27 +13,27 @@ class DiscussionController extends BaseController
 
     protected function verify_token($request)
     {
-        $header = $request->getQueryParams();
+        $header = $request->getHeaders();
         $token = $header['Authorization'][0];
-        // $header = $this->input->get_request_header('Authorization', TRUE);
         try{
-            $current_user = $this->getDecodeJwt($token, $this->key);
+            $current_user = $this->getDecodeJwt($token, getenv("APP_KEY"));
             return (array)$current_user->data;
         }
         catch (\Exception $e){
-            // $this->response(array(
-            //     'status' => 'error',
-            //     'message' => 'Token invalid'
-            // ));         
-
-            echo "Token invalid";
-
-            die();
+            return false;
+            
         }
     }
 
     public function listDiscussion($request){
         $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
         $id = $userArray["id"];
 
         $discussion = new Discussion();
@@ -47,6 +48,7 @@ class DiscussionController extends BaseController
             $discussionJson["name"] = $discussion->getName();
             $discussionJson["users"] = $discussion->getUsersNecessityArray();
             $discussionJson["photo_profil"] = $discussion->getPhoto_profil();
+            $discussionJson["notseen"] = $discussion->getNotSeenMessages($id);
             $discussionJson["date_last_message"] = $discussion->getDate_last_message();
             $discussionsJson[] = $discussionJson;
         }
@@ -54,6 +56,10 @@ class DiscussionController extends BaseController
         return $this->renderJson(
             $discussionsJson
         );
+    }
+
+    public function discussion($request){
+
     }
 
     public function getEncodeJwt($data, $key){

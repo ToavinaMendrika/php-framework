@@ -55,6 +55,28 @@ class DiscussionRepository extends DiscussionEntity{
 		return $usersArray;
 	}
 
+	public function getNotSeenMessages($user_id){
+		$id = $this->getId();
+		$req = $this->db->prepare("
+			SELECT COUNT(mv.id) as nb FROM message_vu mv
+			INNER JOIN message m
+			ON mv.message_id=m.id
+			INNER JOIN discussion d
+			ON m.discussion_id=d.id 
+			WHERE d.id=:id
+			AND mv.user_id=:user_id
+			AND mv.is_seen=FALSE
+		");
+		$req->execute(array(
+			"id" => $id,
+			"user_id" => $user_id,
+		));
+
+		$msg = $req->fetch();
+		$nb = $msg["nb"];
+		return $nb;
+	}
+
 	private function setDb(){
 		$host = "localhost";
 		$db_name = "simple_chat";

@@ -5,39 +5,31 @@ use Framework\Controller\BaseController;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Repositories\UserRepository as User;
 use Firebase\JWT\JWT;
+use GuzzleHttp\Psr7\Response;
 
 class UserController extends BaseController
 {
-    private $key = "example";
 
     protected function verify_token($request)
     {
         $header = $request->getHeaders();
-        $token = $header['Authorization'];
-        // $header = $this->input->get_request_header('Authorization', TRUE);
+        $token = $header['Authorization'][0];
         try{
-            $current_user = $this->getDecodeJwt($token, $this->key);
+            $current_user = $this->getDecodeJwt($token, getenv("APP_KEY"));
             return (array)$current_user->data;
         }
         catch (\Exception $e){
-            // $this->response(array(
-            //     'status' => 'error',
-            //     'message' => 'Token invalid'
-            // ));         
-
-            echo "Token invalid";
-
-            die();
+            return false;
+            
         }
     }
 
     public function register(Request $request){
-        $post = $request->getQueryParams();
 
         $user = new User();
-        $user->setEmail($post['email']);
-        $user->setPseudo($post['username']);
-        $user->setPassword($post['pass']);
+        $user->setEmail($this->getRequestBody($request, 'email'));
+        $user->setPseudo($this->getRequestBody($request, 'username'));
+        $user->setPassword($this->getRequestBody($request, 'pass'));
         $user->setActif(true);
 
         $exist = $user->isEmailExists();
@@ -51,8 +43,7 @@ class UserController extends BaseController
             $userData = array(
                 "id" => $id,
             );
-            $key = $this->key;
-            $jwt = $this->getEncodeJwt($userData, $key);
+            $jwt = $this->getEncodeJwt($userData, getenv('APP_KEY'));
 
             $status = "success";
             $token = $jwt;
@@ -69,11 +60,9 @@ class UserController extends BaseController
     }
 
     public function login(Request $request){
-        $post = $request->getQueryParams();
-
         $user = new User();
-        $user->setEmail($post['email']);
-        $user->setPassword($post['pass']);
+        $user->setEmail($this->getRequestBody($request,'email'));
+        $user->setPassword($this->getRequestBody($request,'pass'));
 
         $exist = $user->isUserExists();
         $status = "error";
@@ -86,9 +75,9 @@ class UserController extends BaseController
             $userData = array(
                 "id" => $id,
             );
-            $key = $this->key;
-            $jwt = $this->getEncodeJwt($userData, $key);
 
+            $jwt = $this->getEncodeJwt($userData, getenv('APP_KEY'));
+            
             $status = "success";
             $token = $jwt;
         }
