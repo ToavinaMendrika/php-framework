@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  mer. 11 sep. 2019 à 10:55
+-- Généré le :  jeu. 12 sep. 2019 à 09:30
 -- Version du serveur :  5.7.21
 -- Version de PHP :  7.2.4
 
@@ -51,7 +51,19 @@ CREATE TABLE IF NOT EXISTS `contact` (
   `user_id` int(10) NOT NULL,
   `friend_id` int(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `contact`
+--
+
+INSERT INTO `contact` (`id`, `user_id`, `friend_id`) VALUES
+(1, 19, 20),
+(2, 19, 21),
+(3, 19, 22),
+(4, 20, 19),
+(6, 21, 19),
+(7, 22, 19);
 
 -- --------------------------------------------------------
 
@@ -80,12 +92,21 @@ DROP TABLE IF EXISTS `discussion`;
 CREATE TABLE IF NOT EXISTS `discussion` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `type` varchar(50) NOT NULL,
-  `name` varchar(50) NOT NULL,
+  `name` varchar(50) DEFAULT NULL,
   `date_creation` datetime(6) NOT NULL,
-  `photo_profil` varchar(50) NOT NULL,
-  `date_last_message` datetime NOT NULL,
+  `photo_profil` varchar(50) DEFAULT NULL,
+  `date_last_message` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `discussion`
+--
+
+INSERT INTO `discussion` (`id`, `type`, `name`, `date_creation`, `photo_profil`, `date_last_message`) VALUES
+(1, 'individual', NULL, '2019-09-12 06:47:52.000000', NULL, NULL),
+(2, 'individual', NULL, '2019-09-12 06:48:08.000000', NULL, NULL),
+(3, 'individual', NULL, '2019-09-12 06:48:14.000000', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -99,7 +120,19 @@ CREATE TABLE IF NOT EXISTS `discussion_user` (
   `discussion_id` int(10) NOT NULL,
   `user_id` int(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `discussion_user`
+--
+
+INSERT INTO `discussion_user` (`id`, `discussion_id`, `user_id`) VALUES
+(1, 1, 19),
+(2, 1, 20),
+(3, 2, 19),
+(4, 2, 21),
+(5, 3, 19),
+(6, 3, 22);
 
 -- --------------------------------------------------------
 
@@ -116,7 +149,16 @@ CREATE TABLE IF NOT EXISTS `message` (
   `user_id` int(10) NOT NULL,
   `discussion_id` int(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `message`
+--
+
+INSERT INTO `message` (`id`, `text`, `type`, `date_envoi`, `user_id`, `discussion_id`) VALUES
+(1, 'Salut !', 'text', '2019-09-12 12:15:45.000000', 19, 1),
+(2, 'Coucou David', 'text', '2019-09-12 12:16:56.000000', 20, 1),
+(3, 'ça va David ?', 'text', '2019-09-12 12:17:42.000000', 20, 1);
 
 -- --------------------------------------------------------
 
@@ -132,7 +174,19 @@ CREATE TABLE IF NOT EXISTS `message_vu` (
   `user_id` int(10) NOT NULL,
   `message_id` int(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+
+--
+-- Déchargement des données de la table `message_vu`
+--
+
+INSERT INTO `message_vu` (`id`, `is_seen`, `date_seen`, `user_id`, `message_id`) VALUES
+(1, 1, '2019-09-12 12:19:34', 19, 1),
+(2, 1, '2019-09-12 12:19:57', 20, 1),
+(3, 0, '2019-09-12 12:20:48', 19, 2),
+(4, 1, '2019-09-12 12:21:03', 20, 2),
+(5, 0, '2019-09-12 12:21:20', 19, 3),
+(6, 1, '2019-09-12 12:21:34', 20, 3);
 
 -- --------------------------------------------------------
 
@@ -177,22 +231,17 @@ CREATE TABLE IF NOT EXISTS `user` (
   `actif` tinyint(1) NOT NULL DEFAULT '1',
   `date_last_modification` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
 
 --
 -- Déchargement des données de la table `user`
 --
 
 INSERT INTO `user` (`id`, `pseudo`, `password`, `email`, `date_creation`, `bio`, `photo_profil`, `actif`, `date_last_modification`) VALUES
-(6, 'David', 'hohoho', '', '2019-08-30 22:22:28.000000', NULL, NULL, 1, NULL),
-(8, 'Jeantre', 'hum', '', '2019-08-31 09:48:58.000000', 'Hello body', 8, 1, '2019-08-31 18:21:27'),
-(9, ':pseudo', ':password', ':email', '2019-09-11 07:14:43.000000', NULL, NULL, 1, NULL),
-(10, 'django_boy', '046531ffc2408bca4ad24ac92c9644c3', 'dj@gmail.com', '2019-09-11 07:15:06.000000', NULL, NULL, 1, NULL),
-(11, 'django_boy', '046531ffc2408bca4ad24ac92c9644c3', 'djd@gmail.com', '2019-09-11 07:21:14.000000', NULL, NULL, 1, NULL),
-(12, ':pseudo', ':password', ':email', '2019-09-11 07:34:28.000000', NULL, NULL, 1, '2019-09-11 07:39:48'),
-(13, 'django_boy', '046531ffc2408bca4ad24ac92c9644c3', 'dja@gmail.com', '2019-09-11 07:40:44.000000', NULL, NULL, 1, '2019-09-11 07:40:44'),
-(14, 'gmail', 'de01c1d48db6c321c637457113ed80d5', 'gmail', '2019-09-11 13:01:19.000000', NULL, NULL, 1, '2019-09-11 13:01:19'),
-(15, 'jj', 'de01c1d48db6c321c637457113ed80d5', 'gmails', '2019-09-11 13:26:32.000000', NULL, NULL, 1, '2019-09-11 13:26:32');
+(22, 'patrick', '6c84cbd30cf9350a990bad2bcc1bec5f', 'patrick', '2019-09-12 06:32:52.000000', NULL, NULL, 1, NULL),
+(21, 'carlo', '7d6543d7862a07edf7902086f39b4b9a', 'carlo', '2019-09-12 06:32:34.000000', NULL, NULL, 1, NULL),
+(20, 'bob', '9f9d51bc70ef21ca5c14f307980a29d8', 'bob', '2019-09-12 06:32:18.000000', NULL, NULL, 1, NULL),
+(19, 'david', '172522ec1028ab781d9dfd17eaca4427', 'david', '2019-09-12 06:31:43.000000', NULL, NULL, 1, NULL);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
