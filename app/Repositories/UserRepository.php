@@ -40,15 +40,13 @@ class UserRepository extends UserEntity{
 			password, 
 			email,
 			actif,
-			date_creation,
-			token
+			date_creation
 		) VALUES (
 			:pseudo, 
 			:password,
 			:email,
 			TRUE,
-			NOW(),
-			''
+			NOW()
 		)");
 		$req -> execute(array(
 			"pseudo" => $pseudo,
@@ -70,6 +68,7 @@ class UserRepository extends UserEntity{
 		$req->execute(array($email));
 		$user = $req->fetch();
 
+		$this->setId($user['id']);
 		$this->setPseudo($user['pseudo']);
 		$this->setPassword($user['password']);
 		$this->setDate_creation($user['date_creation']);

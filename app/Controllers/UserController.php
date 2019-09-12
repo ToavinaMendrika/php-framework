@@ -10,6 +10,27 @@ class UserController extends BaseController
 {
     private $key = "example";
 
+    protected function verify_token($request)
+    {
+        $header = $request->getHeaders();
+        $token = $header['Authorization'];
+        // $header = $this->input->get_request_header('Authorization', TRUE);
+        try{
+            $current_user = $this->getDecodeJwt($token, $this->key);
+            return (array)$current_user->data;
+        }
+        catch (\Exception $e){
+            // $this->response(array(
+            //     'status' => 'error',
+            //     'message' => 'Token invalid'
+            // ));         
+
+            echo "Token invalid";
+
+            die();
+        }
+    }
+
     public function register(Request $request){
         $post = $request->getQueryParams();
 
@@ -67,7 +88,7 @@ class UserController extends BaseController
             );
             $key = $this->key;
             $jwt = $this->getEncodeJwt($userData, $key);
-            
+
             $status = "success";
             $token = $jwt;
         }
