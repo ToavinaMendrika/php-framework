@@ -10,7 +10,6 @@ class UserController extends BaseController
 {
 
     public function register(Request $request){
-
         $user = new User();
         $user->setEmail($this->getRequestBody($request, 'email'));
         $user->setPseudo($this->getRequestBody($request, 'username'));
@@ -23,7 +22,7 @@ class UserController extends BaseController
 
         if (!$exist){
             $user = $user->create();
-
+            
             $id = $user->getId();
             $userData = array(
                 "id" => $id,

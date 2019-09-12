@@ -35,26 +35,11 @@ class UserRepository extends UserEntity{
 		$email = $this->getEmail();
 		$pseudo = $this->getPseudo();
 		$password = $this->getPassword();
-		$req = $this->db->prepare("INSERT INTO user (
-			pseudo, 
-			password, 
-			email,
-			actif,
-			date_creation,
-			token
-		) VALUES (
-			:pseudo, 
-			:password,
-			:email,
-			TRUE,
-			NOW(),
-			''
-		)");
-		$req -> execute(array(
-			"pseudo" => $pseudo,
-			"password" => $password,
-			"email" => $email,
-		));
+		
+		$req = $this->db->prepare("INSERT INTO user 
+		(pseudo, password, `email`, `date_creation`, `date_last_modification`)
+		 VALUES (?, ?, ?, NOW(), NOW())");
+		$req -> execute([$pseudo, $password,$email,]);
 
 		$req = $this->db->prepare("SELECT * FROM user WHERE email=?");
 		$req->execute(array($email));

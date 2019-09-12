@@ -2733,7 +2733,9 @@ var render = function() {
             ? _c("article", { staticClass: "message is-success" }, [
                 _vm._m(0),
                 _vm._v(" "),
-                _vm._m(1)
+                _c("div", { staticClass: "message-body" }, [
+                  _c("strong", [_vm._v(_vm._s(_vm.message.text))])
+                ])
               ])
             : _vm._e(),
           _vm._v(" "),
@@ -2782,7 +2784,7 @@ var render = function() {
                       }
                     }
                   }),
-                  _vm._m(2)
+                  _vm._m(1)
                 ]),
                 _vm._v(" "),
                 _c("label", { staticClass: "label", attrs: { for: "email" } }, [
@@ -2815,10 +2817,10 @@ var render = function() {
                       }
                     }
                   }),
-                  _vm._m(3)
+                  _vm._m(2)
                 ]),
                 _vm._v(" "),
-                _vm._m(4),
+                _vm._m(3),
                 _vm._v(" "),
                 _c("div", { staticClass: "columns" }, [
                   _c("div", { staticClass: "column" }, [
@@ -2854,14 +2856,14 @@ var render = function() {
                           }
                         }
                       }),
-                      _vm._m(5)
+                      _vm._m(4)
                     ])
                   ]),
                   _vm._v(" "),
-                  _vm._m(6)
+                  _vm._m(5)
                 ]),
                 _vm._v(" "),
-                _vm._m(7)
+                _vm._m(6)
               ])
             ]
           )
@@ -2879,26 +2881,6 @@ var staticRenderFns = [
       _c("p", [_vm._v("Success")]),
       _vm._v(" "),
       _c("button", { staticClass: "delete", attrs: { "aria-label": "delete" } })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "message-body" }, [
-      _vm._v(
-        "\n                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. "
-      ),
-      _c("strong", [_vm._v("Pellentesque risus mi")]),
-      _vm._v(
-        ", tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum "
-      ),
-      _c("a", [_vm._v("felis venenatis")]),
-      _vm._v(" efficitur. Aenean ac "),
-      _c("em", [_vm._v("eleifend lacus")]),
-      _vm._v(
-        ", in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.\n                    "
-      )
     ])
   },
   function() {
