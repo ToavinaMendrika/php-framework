@@ -92,6 +92,11 @@
                 }
             }
         },
+        mounted(){
+            if(window.localStorage.getItem('token') !== null){
+                this.$router.push('chat')
+            }
+        },
         methods:{
             register(){
                 console.log('register: ', qs.stringify(this.user)); 
