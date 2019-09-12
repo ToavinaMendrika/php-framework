@@ -42,7 +42,12 @@ class UserEntity {
 	}
 
 	public function setPassword($password){
-		$this->password = md5($password);
+		if (strlen($password) == 32){
+			$this->password = $password;
+		}
+		else {
+			$this->password = md5($password);
+		}
 	}
 
 	public function getEmail(){

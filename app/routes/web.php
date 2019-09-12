@@ -13,3 +13,5 @@ $router->set404(function() {
 
 $router->post('/user/register', 'UserController@register');
 $router->post('/user/login', 'UserController@login');
+$router->get('/chat/discussion', 'DiscussionController@listDiscussion');
+$router->get('/chat/discussion/{id}', 'DiscussionController@discussion');

@@ -5,9 +5,24 @@ use Framework\Controller\BaseController;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Repositories\UserRepository as User;
 use Firebase\JWT\JWT;
+use GuzzleHttp\Psr7\Response;
 
 class UserController extends BaseController
 {
+
+    protected function verify_token($request)
+    {
+        $header = $request->getHeaders();
+        $token = $header['Authorization'][0];
+        try{
+            $current_user = $this->getDecodeJwt($token, getenv("APP_KEY"));
+            return (array)$current_user->data;
+        }
+        catch (\Exception $e){
+            return false;
+            
+        }
+    }
 
     public function register(Request $request){
         $user = new User();
@@ -44,7 +59,6 @@ class UserController extends BaseController
     }
 
     public function login(Request $request){
-    
         $user = new User();
         $user->setEmail($this->getRequestBody($request,'email'));
         $user->setPassword($this->getRequestBody($request,'pass'));
