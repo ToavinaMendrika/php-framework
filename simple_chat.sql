@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  jeu. 12 sep. 2019 à 09:30
+-- Généré le :  ven. 13 sep. 2019 à 01:50
 -- Version du serveur :  5.7.21
 -- Version de PHP :  7.2.4
 
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `discussion` (
   `name` varchar(50) DEFAULT NULL,
   `date_creation` datetime(6) NOT NULL,
   `photo_profil` varchar(50) DEFAULT NULL,
-  `date_last_message` datetime DEFAULT NULL,
+  `last_message` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
@@ -103,10 +103,10 @@ CREATE TABLE IF NOT EXISTS `discussion` (
 -- Déchargement des données de la table `discussion`
 --
 
-INSERT INTO `discussion` (`id`, `type`, `name`, `date_creation`, `photo_profil`, `date_last_message`) VALUES
-(1, 'individual', NULL, '2019-09-12 06:47:52.000000', NULL, NULL),
-(2, 'individual', NULL, '2019-09-12 06:48:08.000000', NULL, NULL),
-(3, 'individual', NULL, '2019-09-12 06:48:14.000000', NULL, NULL);
+INSERT INTO `discussion` (`id`, `type`, `name`, `date_creation`, `photo_profil`, `last_message`) VALUES
+(1, 'individual', '', '2019-09-12 06:47:52.000000', NULL, 3),
+(2, 'individual', NULL, '2019-09-12 06:48:08.000000', NULL, 4),
+(3, 'individual', NULL, '2019-09-12 06:48:14.000000', NULL, 5);
 
 -- --------------------------------------------------------
 
@@ -143,22 +143,24 @@ INSERT INTO `discussion_user` (`id`, `discussion_id`, `user_id`) VALUES
 DROP TABLE IF EXISTS `message`;
 CREATE TABLE IF NOT EXISTS `message` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `text` text NOT NULL,
+  `msg_text` text NOT NULL,
   `type` varchar(50) NOT NULL,
   `date_envoi` datetime(6) NOT NULL,
   `user_id` int(10) NOT NULL,
   `discussion_id` int(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 
 --
 -- Déchargement des données de la table `message`
 --
 
-INSERT INTO `message` (`id`, `text`, `type`, `date_envoi`, `user_id`, `discussion_id`) VALUES
+INSERT INTO `message` (`id`, `msg_text`, `type`, `date_envoi`, `user_id`, `discussion_id`) VALUES
 (1, 'Salut !', 'text', '2019-09-12 12:15:45.000000', 19, 1),
 (2, 'Coucou David', 'text', '2019-09-12 12:16:56.000000', 20, 1),
-(3, 'ça va David ?', 'text', '2019-09-12 12:17:42.000000', 20, 1);
+(3, 'ça va David ?', 'text', '2019-09-12 12:17:42.000000', 20, 1),
+(4, 'Bonjour Mr Carlo', 'text', '2019-09-13 01:56:06.000000', 19, 2),
+(5, 'Hey, tu t\'appelles David ?', 'text', '2019-09-13 02:01:16.000000', 22, 3);
 
 -- --------------------------------------------------------
 
@@ -174,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `message_vu` (
   `user_id` int(10) NOT NULL,
   `message_id` int(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 
 --
 -- Déchargement des données de la table `message_vu`
@@ -183,10 +185,14 @@ CREATE TABLE IF NOT EXISTS `message_vu` (
 INSERT INTO `message_vu` (`id`, `is_seen`, `date_seen`, `user_id`, `message_id`) VALUES
 (1, 1, '2019-09-12 12:19:34', 19, 1),
 (2, 1, '2019-09-12 12:19:57', 20, 1),
-(3, 0, '2019-09-12 12:20:48', 19, 2),
+(3, 0, NULL, 19, 2),
 (4, 1, '2019-09-12 12:21:03', 20, 2),
-(5, 0, '2019-09-12 12:21:20', 19, 3),
-(6, 1, '2019-09-12 12:21:34', 20, 3);
+(5, 0, NULL, 19, 3),
+(6, 1, '2019-09-12 12:21:34', 20, 3),
+(7, 1, '2019-09-13 02:06:17', 19, 4),
+(8, 0, NULL, 21, 4),
+(9, 0, NULL, 19, 5),
+(10, 1, '2019-09-13 02:07:24', 22, 5);
 
 -- --------------------------------------------------------
 
@@ -231,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `actif` tinyint(1) NOT NULL DEFAULT '1',
   `date_last_modification` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
 
 --
 -- Déchargement des données de la table `user`

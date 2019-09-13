@@ -34,7 +34,7 @@ class UserEntity {
 	}
 
 	public function setPseudo($pseudo){
-		$this->pseudo = $pseudo;
+		$this->pseudo = utf8_encode($pseudo);
 	}
 
 	public function getPassword(){

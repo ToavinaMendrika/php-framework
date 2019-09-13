@@ -37,7 +37,7 @@ class UserController extends BaseController
         $token = "";
 
         if (!$exist){
-            $user = $user->create();
+            $user->create();
 
             $id = $user->getId();
             $userData = array(
@@ -69,7 +69,7 @@ class UserController extends BaseController
         $token = "";
 
         if ($exist){
-            $user = $user->loadByEmail();
+            $user->loadByEmail();
 
             $id = $user->getId();
             $userData = array(

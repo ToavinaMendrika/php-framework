@@ -13,7 +13,7 @@ class DiscussionEntity {
 
 	private $photo_profil;
 
-	private $date_last_messgae;
+	private $last_message;
 
 	public function getId(){
 		return $this->id;
@@ -44,7 +44,7 @@ class DiscussionEntity {
 	}
 
 	public function setName($name){
-		$this->name = $name;
+		$this->name = utf8_encode($name);
 	}
 
 	public function getPhoto_profil(){
@@ -55,11 +55,11 @@ class DiscussionEntity {
 		$this->photo_profil = $photo_profil;
 	}
 
-	public function getDate_last_message(){
-		return $this->date_last_messgae;
+	public function getLast_message(){
+		return $this->last_message;
 	}
 
-	public function setDate_last_message($date_last_message){
-		$this->date_last_message = $date_last_message;
+	public function setLast_message($last_message){
+		$this->last_message = $last_message;
 	}
 }
