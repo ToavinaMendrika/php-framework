@@ -32,7 +32,7 @@ class UserController extends BaseController
         $user->setPassword($this->getRequestBody($request, 'pass'));
         $user->setActif(true);
 
-        $exist = $user->isEmailExists();
+        $exist = $user->isEmailOrPseudoExist();
         $status = "error";
         $token = "";
 
@@ -50,7 +50,7 @@ class UserController extends BaseController
         }
         else {
             $status = "error";
-            $token = "L'adresse email existe déjà";
+            $token = "L'adresse email ou le nom d'utilisateur existe déjà";
         }
 
         return $this->renderJson(array(
@@ -153,8 +153,20 @@ class UserController extends BaseController
 
         $user = new User();
         $search = $this->getRequestBody($request,'search');
+        $scope = $this->getRequestBody($request, 'scope');
 
-        $result = $user->findSearch($search);
+        $result = array();
+        if ($scope == 'global'){
+            $result = $user->findSearch($search);
+        }
+        else if ($scope == 'contact'){
+            $the_user = $this->getRequestBody($request, 'user_id');
+            if ($the_user == "self"){
+                $the_user = $user_id;
+            }
+            $result = $user->findSearchInContact($search, $the_user);
+        }
+        
 
         $usersJson = array();
         foreach ($result as $u) {
