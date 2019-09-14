@@ -81,7 +81,7 @@ class DiscussionRepository extends DiscussionEntity{
 	public function getMessages(){
 		$id = $this->getId();
 		$req = $this->db->prepare("
-			SELECT * FROM message WHERE discussion_id=? ORDER BY date_envoi DESC
+			SELECT * FROM message WHERE discussion_id=? ORDER BY date_envoi ASC
 		");
 		$req->execute(array(
 			$id
