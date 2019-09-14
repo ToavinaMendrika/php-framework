@@ -25,19 +25,20 @@ class UserController extends BaseController
     }
 
     public function register(Request $request){
+
         $user = new User();
         $user->setEmail($this->getRequestBody($request, 'email'));
         $user->setPseudo($this->getRequestBody($request, 'username'));
         $user->setPassword($this->getRequestBody($request, 'pass'));
         $user->setActif(true);
 
-        $exist = $user->isEmailExists();
+        $exist = $user->isEmailOrPseudoExist();
         $status = "error";
         $token = "";
 
         if (!$exist){
-            $user = $user->create();
-            
+            $user->create();
+
             $id = $user->getId();
             $userData = array(
                 "id" => $id,
@@ -49,7 +50,7 @@ class UserController extends BaseController
         }
         else {
             $status = "error";
-            $token = "L'adresse email existe déjà";
+            $token = "L'adresse email ou le nom d'utilisateur existe déjà";
         }
 
         return $this->renderJson(array(
@@ -68,7 +69,7 @@ class UserController extends BaseController
         $token = "";
 
         if ($exist){
-            $user = $user->loadByEmail();
+            $user->loadByEmail();
 
             $id = $user->getId();
             $userData = array(
@@ -88,6 +89,100 @@ class UserController extends BaseController
         return $this->renderJson(array(
             "status" => $status,
             "token" => $token,
+        ));
+    }
+
+    public function userAbout($request, $id){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        if ($id == "self"){
+            $id = $user_id;
+        }
+
+        $user = new User();
+        $user->setId($id);
+        $user->load();
+
+        $found = false;
+        if ($user->getId()){
+            $found = true;
+
+            $userJson = array();
+            $userJson['id'] = $user->getId();
+            $userJson['pseudo'] = $user->getPseudo();
+            $userJson['email'] = $user->getEmail();
+            $userJson['date_creation'] = $user->getDate_creation();
+            $userJson['photo_profil'] = $user->getPhoto_profil();
+            $userJson['bio'] = $user->getBio();
+            $userJson['actif'] = $user->getActif();
+            $userJson['date_last_modification'] = $user->getDate_last_modification();
+
+            $is_current_user = $user_id == $user->getId() ? true : false;
+
+            return $this->renderJson(array(
+                "found_user" => $found,
+                "is_current_user" => $is_current_user,
+                "user" => $userJson,
+            ));
+        }
+        else {
+            return $this->renderJson(array(
+                "found_user" => $found,
+            ));
+        }
+    }
+
+    public function search($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $user = new User();
+        $search = $this->getRequestBody($request,'search');
+        $scope = $this->getRequestBody($request, 'scope');
+
+        $result = array();
+        if ($scope == 'global'){
+            $result = $user->findSearch($search);
+        }
+        else if ($scope == 'contact'){
+            $the_user = $this->getRequestBody($request, 'user_id');
+            if ($the_user == "self"){
+                $the_user = $user_id;
+            }
+            $result = $user->findSearchInContact($search, $the_user);
+        }
+        
+
+        $usersJson = array();
+        foreach ($result as $u) {
+            $uArr = array();
+            $uArr["is_current_user"] = $u->getId() == $user_id ? true : false;
+            $uArr["id"] = $u->getId();
+            $uArr["pseudo"] = $u->getPseudo();
+            $uArr["photo_profil"] = $u->getPhoto_profil();
+            $uArr["bio"] = $u->getBio();
+            $uArr["actif"] = $u->getActif();
+            $usersJson[] = $uArr;
+        }
+
+        return $this->renderJson(array(
+            "nb" => count($usersJson),
+            "users" => $usersJson,
         ));
     }
 

@@ -3,13 +3,13 @@
 namespace App\Repositories;
 
 use App\Models\DiscussionEntity;
-use \PDO;
+use Framework\Database\Connection;
 
 class DiscussionRepository extends DiscussionEntity{
 	private $db = null;
 
 	function __construct(){
-		$this->setDb();
+		$this->db = Connection::getPDO();
 	}
 
 	public function getDiscussionsFromUserId($user_id){
@@ -28,7 +28,7 @@ class DiscussionRepository extends DiscussionEntity{
 			$discussion->setType($discussionArray['type']); 
 			$discussion->setName($discussionArray['name']); 
 			$discussion->setPhoto_profil($discussionArray['photo_profil']); 
-			$discussion->setDate_last_message($discussionArray['date_last_message']); 
+			$discussion->setLast_message($discussionArray['last_message']); 
 			$discussionsArray[] = $discussion;
 		}
 		return $discussionsArray;
@@ -50,6 +50,7 @@ class DiscussionRepository extends DiscussionEntity{
 			$user["id"] = $userArray["user_id"];
 			$user["pseudo"] = $userArray["pseudo"];
 			$user["photo_profil"] = $userArray["photo_profil"];
+			$user["actif"] = $userArray["actif"];
 			$usersArray[] = $user;
 		}
 		return $usersArray;
@@ -77,17 +78,86 @@ class DiscussionRepository extends DiscussionEntity{
 		return $nb;
 	}
 
-	private function setDb(){
-		$host = "localhost";
-		$db_name = "simple_chat";
-		$login = "root";
-		$password = "";
+	public function getMessages(){
+		$id = $this->getId();
+		$req = $this->db->prepare("
+			SELECT * FROM message WHERE discussion_id=? ORDER BY date_envoi DESC
+		");
+		$req->execute(array(
+			$id
+		));
 
-		$info = "mysql:host=" . $host . ";dbname=" . $db_name;
-		$login = $login;
-		$password = $password;
+		$messagesArray = array();
+		while ($messageArray = $req->fetch()){
+			$message = new MessageRepository();
+			$message->setId($messageArray["id"]);
+			$message->setMsg_text($messageArray["msg_text"]);
+			$message->setDate_envoi($messageArray["date_envoi"]);
+			$message->setType($messageArray["type"]);
+			$message->setUser_id($messageArray["user_id"]);
+			$message->setDiscussion_id($messageArray["discussion_id"]);
+			$messagesArray[] = $message;
+		}
+		return $messagesArray;
+	}
 
-		$bdd = new PDO($info, $login, $password);
-		$this->db = $bdd;
+	public function getLast_messageArray(){
+		$id = $this->getId();
+		$req = $this->db->prepare("
+			SELECT * FROM message m
+			INNER JOIN discussion d
+			ON m.id=d.last_message
+			WHERE d.id=?
+		");
+		$req->execute(array(
+			$id
+		));
+
+		$message = $req->fetch();
+
+		$messageArray = array();
+		$messageArray["id"] = $message["id"];
+		$messageArray["msg_text"] = utf8_encode($message["msg_text"]);
+		$messageArray["date_envoi"] = $message["date_envoi"];
+		$messageArray["type"] = $message["type"];
+		$messageArray["user_id"] = $message["user_id"];
+		$messageArray["discussion_id"] = $message["discussion_id"];
+
+		return $messageArray;
+	}
+
+	public function load(){
+		$id = $this->getId();
+		$req = $this->db->prepare("SELECT * FROM discussion WHERE id=?");
+		$req->execute(array($id));
+		$discussion = $req->fetch();
+
+		$this->setId($discussion['id']);
+		$this->setDate_creation($discussion['date_creation']);
+		$this->setType($discussion['type']);
+		$this->setName($discussion['name']);
+		$this->setPhoto_profil($discussion['photo_profil']);
+		$this->setLast_message($discussion['last_message']);
+
+		return $this;
+	}
+
+	public function update(){
+		$req = $this->db->prepare("UPDATE discussion SET 
+			date_creation=:date_creation,
+			type=:type,
+			name=:name,
+			photo_profil=:photo_profil,
+			last_message=:last_message
+			WHERE id = :id
+		");
+		$req -> execute(array(
+			"id" => $this -> getId(),
+			"date_creation" => $this -> getDate_creation(),
+			"type" => $this -> getType(),
+			"name" => $this -> getName(),
+			"photo_profil" => $this -> getPhoto_profil(),
+			"last_message" => $this -> getLast_message(),
+		));
 	}
 }

@@ -12,10 +12,11 @@ class UserRepository extends UserEntity{
 		$this->db = Connection::getPDO();
 	}
 
-	public function isEmailExists(){
+	public function isEmailOrPseudoExist(){
 		$email = $this->getEmail();
-		$req = $this->db->prepare("SELECT * FROM user WHERE email=?");
-		$req->execute(array($email));
+		$pseudo = $this->getPseudo();
+		$req = $this->db->prepare("SELECT * FROM user WHERE email=? OR pseudo=?");
+		$req->execute(array($email, $pseudo));
 		$user = $req->fetch();
 		$isExist = $user == false ? false : true;
 		return $isExist;
@@ -71,6 +72,7 @@ class UserRepository extends UserEntity{
 		$this->setId($user['id']);
 		$this->setPseudo($user['pseudo']);
 		$this->setPassword($user['password']);
+		$this->setEmail($user['email']);
 		$this->setDate_creation($user['date_creation']);
 		$this->setBio($user['bio']);
 		$this->setPhoto_profil($user['password']);
@@ -80,12 +82,84 @@ class UserRepository extends UserEntity{
 		return $this;
 	}
 
-	public function selectUserByPseudo(){
+	public function load(){
+		$id = $this->getId();
+		$req = $this->db->prepare("SELECT * FROM user WHERE id=?");
+		$req->execute(array($id));
+		$user = $req->fetch();
 
+		$this->setId($user['id']);
+		$this->setPseudo($user['pseudo']);
+		$this->setPassword($user['password']);
+		$this->setEmail($user['email']);
+		$this->setDate_creation($user['date_creation']);
+		$this->setPhoto_profil($user['photo_profil']);
+		$this->setBio($user['bio']);
+		$this->setActif($user['actif']);
+		$this->setDate_last_modification($user['date_last_modification']);
+
+		return $this;
 	}
 
-	public function selectUserById(){
-		
+	public function findSearch($search){
+		$s = strtolower($search);
+		$req = $this->db->prepare("SELECT * FROM user
+			WHERE LOWER(pseudo) LIKE :s
+			OR LOWER(email) LIKE :s
+			ORDER BY LOWER(pseudo) LIKE :so DESC,LOWER(pseudo) LIKE :s DESC
+		");
+		$req->execute(array(
+			"s" => "%" . $s . "%",
+			"so" => $s . "%",
+		));
+		$users = array();
+		while ($user = $req->fetch()){
+			$userO = new UserRepository();
+			$userO->setId($user['id']);
+			$userO->setPseudo($user['pseudo']);
+			$userO->setPassword($user['password']);
+			$userO->setEmail($user['email']);
+			$userO->setDate_creation($user['date_creation']);
+			$userO->setPhoto_profil($user['photo_profil']);
+			$userO->setBio($user['bio']);
+			$userO->setActif($user['actif']);
+			$userO->setDate_last_modification($user['date_last_modification']);
+			$users[] = $userO;
+		}
+		return $users;
+	}
+
+	public function findSearchInContact($search, $user_id){
+		$s = strtolower($search);
+		$req = $this->db->prepare("
+			SELECT * FROM user u
+			INNER JOIN contact c
+			ON u.id=c.friend_id
+			WHERE 
+			c.user_id=:user_id
+			AND (LOWER(pseudo) LIKE :s OR LOWER(email) LIKE :s)
+			ORDER BY LOWER(pseudo) LIKE :so DESC,LOWER(pseudo) LIKE :s DESC
+		");
+		$req->execute(array(
+			"user_id" => $user_id,
+			"s" => "%" . $s . "%",
+			"so" => $s . "%",
+		));
+		$users = array();
+		while ($user = $req->fetch()){
+			$userO = new UserRepository();
+			$userO->setId($user['friend_id']);
+			$userO->setPseudo($user['pseudo']);
+			$userO->setPassword($user['password']);
+			$userO->setEmail($user['email']);
+			$userO->setDate_creation($user['date_creation']);
+			$userO->setPhoto_profil($user['photo_profil']);
+			$userO->setBio($user['bio']);
+			$userO->setActif($user['actif']);
+			$userO->setDate_last_modification($user['date_last_modification']);
+			$users[] = $userO;
+		}
+		return $users;
 	}
 
 	public function update(){
