@@ -10,6 +10,7 @@ import Vue from 'vue';
 import App from './components/App.vue'
 import VueRouter from 'vue-router'
 import router from './components/routes/router'
+
 /*
 Vue.component('memo', require('./components/Memo.vue'));
 Vue.component('datacar', require('./components/Datacar.vue'));*/

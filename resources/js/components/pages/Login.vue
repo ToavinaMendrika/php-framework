@@ -1,6 +1,11 @@
 <template>
     <div>
-       
+        <div class="container">
+            <router-link to="/register">Register</router-link>
+            <router-link to="/">Login</router-link>
+            <router-link to="/chat">Chat</router-link>
+            <a href="/logout" @click.prevent="logout">logout</a>
+        </div>
             <div class="section">
                 <div class="container">
                     <div class="title">Login</div>
@@ -67,7 +72,7 @@
         },
         mounted(){
             if(window.localStorage.getItem('token') !== null){
-                this.$router.push('chat')
+                this.$router.push({ name: 'chat_home'})
             }
         },
         methods:{
@@ -88,7 +93,7 @@
                     }
                     else{
                         window.localStorage.setItem('token', response.data.token)
-                        this.$router.push('chat')
+                        this.$router.push({ name: 'chat_home'})
                     }
                    
                 })

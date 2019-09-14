@@ -1,15 +1,24 @@
 <template>
     <div>
-       <div class="container">
-        <h2 class="title">Chat Room page</h2>
-        <p>{{ token }}</p>
-       </div>
+        <navbar></navbar>
+        <main class="main">
+            <div class="columns is-gapless">
+                 <sidebar></sidebar>
+                 <router-view></router-view>
+            </div>
+        </main>
     </div>
 </template>
 <script>
     import axios from 'axios'
+    import navbar from './components/navbar'
+    import sidebar from './components/sidebar'
     const qs = require('querystring')
     export default {
+        components: {
+            navbar,
+            sidebar
+        },
         data(){
             return {
                 token: window.localStorage.getItem('token')

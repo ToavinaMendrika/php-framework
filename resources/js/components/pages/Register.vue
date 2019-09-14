@@ -1,5 +1,11 @@
 <template>
     <div>
+        <div class="container">
+            <router-link to="/register">Register</router-link>
+            <router-link to="/">Login</router-link>
+            <router-link to="/chat">Chat</router-link>
+            <a href="/logout" @click.prevent="logout">logout</a>
+        </div>
         <form action="post">
             <div class="section">
                 <div class="container">
@@ -94,7 +100,7 @@
         },
         mounted(){
             if(window.localStorage.getItem('token') !== null){
-                this.$router.push('chat')
+                this.$router.push({ name: 'chat_home'})
             }
         },
         methods:{
