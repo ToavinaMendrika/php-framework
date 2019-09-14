@@ -92,6 +92,88 @@ class UserController extends BaseController
         ));
     }
 
+    public function userAbout($request, $id){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        if ($id == "self"){
+            $id = $user_id;
+        }
+
+        $user = new User();
+        $user->setId($id);
+        $user->load();
+
+        $found = false;
+        if ($user->getId()){
+            $found = true;
+
+            $userJson = array();
+            $userJson['id'] = $user->getId();
+            $userJson['pseudo'] = $user->getPseudo();
+            $userJson['email'] = $user->getEmail();
+            $userJson['date_creation'] = $user->getDate_creation();
+            $userJson['photo_profil'] = $user->getPhoto_profil();
+            $userJson['bio'] = $user->getBio();
+            $userJson['actif'] = $user->getActif();
+            $userJson['date_last_modification'] = $user->getDate_last_modification();
+
+            $is_current_user = $user_id == $user->getId() ? true : false;
+
+            return $this->renderJson(array(
+                "found_user" => $found,
+                "is_current_user" => $is_current_user,
+                "user" => $userJson,
+            ));
+        }
+        else {
+            return $this->renderJson(array(
+                "found_user" => $found,
+            ));
+        }
+    }
+
+    public function search($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $user = new User();
+        $search = $this->getRequestBody($request,'search');
+
+        $result = $user->findSearch($search);
+
+        $usersJson = array();
+        foreach ($result as $u) {
+            $uArr = array();
+            $uArr["is_current_user"] = $u->getId() == $user_id ? true : false;
+            $uArr["id"] = $u->getId();
+            $uArr["pseudo"] = $u->getPseudo();
+            $uArr["photo_profil"] = $u->getPhoto_profil();
+            $uArr["bio"] = $u->getBio();
+            $uArr["actif"] = $u->getActif();
+            $usersJson[] = $uArr;
+        }
+
+        return $this->renderJson(array(
+            "nb" => count($usersJson),
+            "users" => $usersJson,
+        ));
+    }
+
     public function getEncodeJwt($data, $key){
         // $tokenId    = base64_encode(mcrypt_create_iv(32));
         $issuedAt   = time();

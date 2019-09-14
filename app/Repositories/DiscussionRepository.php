@@ -50,6 +50,7 @@ class DiscussionRepository extends DiscussionEntity{
 			$user["id"] = $userArray["user_id"];
 			$user["pseudo"] = $userArray["pseudo"];
 			$user["photo_profil"] = $userArray["photo_profil"];
+			$user["actif"] = $userArray["actif"];
 			$usersArray[] = $user;
 		}
 		return $usersArray;
