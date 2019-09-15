@@ -14,10 +14,20 @@ class DiscussionRepository extends DiscussionEntity{
 
 	public function getDiscussionsFromUserId($user_id){
 		$req = $this->db->prepare("
-			SELECT * FROM discussion d
-			INNER JOIN discussion_user du
+			SELECT 
+			du.discussion_id,
+			date_creation,
+			d.type,
+			name,
+			photo_profil,
+			last_message
+			FROM discussion_user du
+			INNER JOIN discussion d
 			ON d.id=du.discussion_id 
+			INNER JOIN message m
+			ON d.last_message=m.id
 			WHERE du.user_id=?
+			ORDER BY m.date_envoi DESC
 		");
 		$req->execute(array($user_id));
 		$discussionsArray = array();
