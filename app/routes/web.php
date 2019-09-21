@@ -18,3 +18,7 @@ $router->get('/user/{id}', 'UserController@userAbout');	// '/user/self' correspo
 $router->post('/user/search', 'UserController@search');
 $router->post('/user/request/add', 'UserController@addUser');
 $router->post('/user/request/all', 'UserController@allUsersFromRequest');
+$router->post('/user/request/seen', 'UserController@seeRequests');
+$router->post('/user/request/response', 'UserController@responseRequest');
+$router->post('/chat/message/seen', 'MessageController@seeMessages');
+$router->post('/chat/discussion_profil', 'DiscussionController@sendMessageFromProfil');
