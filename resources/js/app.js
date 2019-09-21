@@ -6,10 +6,10 @@
  * 
  * 
  */
-import Vue from 'vue';
-import App from './components/App.vue'
+import Vue from 'vue'
 import VueRouter from 'vue-router'
 import router from './components/routes/router'
+//import App from './components/App'
 
 /*
 Vue.component('memo', require('./components/Memo.vue'));
@@ -17,12 +17,10 @@ Vue.component('datacar', require('./components/Datacar.vue'));*/
 
 //Vue.component('app', require('./components/App.vue'))
 Vue.use(VueRouter)
-
+//const store = require('./store/discussionStore')
 const app = new Vue({
-  el: '#app',
   router,
-  components : {
-    App
-  },  
-})
+  store : require('./store/discussionStore'),
+  render: h => h(require('./components/App').default)  
+}).$mount('#app')
 console.log('hello')

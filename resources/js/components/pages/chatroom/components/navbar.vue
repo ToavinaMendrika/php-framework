@@ -29,7 +29,7 @@
             <div class="navbar-end">
                 <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">
-                    <img class="avatar" src="https://api.adorable.io/avatars/45/test@adorable.png" alt=""> Toavina
+                    <img class="avatar" :src="'https://api.adorable.io/avatars/45/'+currentUser.pseudo+'@adorable.png'" alt=""> {{currentUser.pseudo}}
                 </a>
         
                 <div class="navbar-dropdown is-right">
@@ -51,7 +51,27 @@
     </div>
 </template>
 <script>
+    import axios from 'axios'
     export default {
+        data(){
+            return {
+                currentUser : {}
+            }
+        },
+        mounted(){
+            axios.get('/user/self',{
+                headers: {
+                   'Authorization': window.localStorage.getItem('token')
+               }
+           })
+           .then((response)=>  {
+              this.currentUser = response.data.user
+              console.log(this.currentUser)
+           })
+           .catch(function (error) {
+               console.log(error);
+           });
+        },
         methods:{
             logout(){
                 window.localStorage.removeItem('token')

@@ -3,15 +3,19 @@
         <div class="bordered discussion">
           <!-- begin card discussion -->
 
-        <span v-for="discussion in discussions">
+        <span v-for="discussion in discussions.discussions">
             <router-link :to="{ name: 'chat_box', params: { id: discussion.id }}">
             <div class="discussion-card">
               <div class="avatar">
-                <img :src="'https://api.adorable.io/avatars/45/'+ discussion.users[1].pseudo +'@adorable.png'" alt="">
+                <span v-for="user in discussion.users">
+                  <img v-if="user.id != discussions.current_user_id" :src="'https://api.adorable.io/avatars/45/'+ user.pseudo +'@adorable.png'" alt="">
+                </span> 
                 <span class="not-read" v-if="discussion.notseen !== '0'">{{ discussion.notseen }}</span>
               </div>
               <div class="discussion-body">
-                <p>{{ discussion.users[1].pseudo }}</p>
+                <span v-for="user in discussion.users">
+                  <p v-if="user.id != discussions.current_user_id">{{ user.pseudo }}</p>
+                </span> 
                 <small class="date">{{ discussion.last_message.date_envoi }}</small>               
               </div>
               <div class="status">
@@ -28,34 +32,22 @@
 <script>
     import axios from 'axios'
     import moment from 'moment'
+    import store from '../../../../store/discussionStore'
     const qs = require('querystring')
-    export default {       
+    export default {
+        store: store, 
         data(){
             return {
-                discussions: []
+                //discussions: []
+            }
+        },
+        computed: {
+            discussions(){
+              return store.getters.discussions
             }
         },
         mounted(){
-            axios.get('/chat/discussion',{
-                     headers: {
-                        'Authorization': window.localStorage.getItem('token')
-                    }
-                })
-                .then((response)=>  {
-                    this.discussions = response.data.discussions
-                    console.log(response);
-                    window.setTimeout(function(){
-                        document.querySelectorAll('.date').forEach(function(el){
-                        let date = el.innerText
-                        el.innerText = moment(date).fromNow()
-                    },500)
-                    })
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-
-            
-        },
+            store.dispatch('addDiscussions')
+        }
     }
 </script>
