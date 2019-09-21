@@ -184,4 +184,111 @@ class UserRepository extends UserEntity{
 		));
 	}
 
+	public function addRequest($from_id, $to_id){
+		$req = $this->db->prepare("SELECT * FROM demande 
+			WHERE send_id=? 
+			AND receive_id=?
+			AND actif=TRUE
+		");
+		$req->execute(array($from_id, $to_id));
+		$demande = $req->fetch();
+
+		$resultat = array(
+			"status" => "error",
+			"message" => "",
+		);
+		if ($demande == false){
+			$this->createDemande($from_id, $to_id);
+			$resultat["status"] = "success";
+			$resultat["message"] = "Demande en cours";
+		}
+		else{
+			$is = $demande["is_accepted"];
+			if ($is == NULL){
+				$this->annulationDemande($from_id, $to_id);
+				$resultat["status"] = "success";
+				$resultat["message"] = "Annulation de la demande";
+			}
+		}
+
+		return $resultat;
+	}
+
+	public function createDemande($from_id, $to_id){
+		$req = $this->db->prepare("
+			INSERT INTO demande(
+				send_id, 
+				receive_id, 
+				is_accepted, 
+				date_envoi, 
+				date_acceptation,
+				date_refus,
+				date_annulation,
+				actif
+			) 
+			VALUES (
+				?, 
+				?, 
+				NULL, 
+				NOW(), 
+				NULL,
+				NULL,
+				NULL,
+				TRUE
+			)
+		");
+		$req->execute(array($from_id, $to_id));
+	}
+
+	public function getAllUsersFromRequest($array=false){
+		$id = $this->getId();
+		$req = $this->db->prepare("SELECT * FROM user u
+			INNER JOIN demande d
+			ON u.id=d.send_id
+			WHERE receive_id=?
+			AND d.actif=TRUE
+			ORDER BY d.date_envoi DESC
+		");
+		$req->execute(array($id));
+
+		$usersArray = array();
+		if (!$array){
+			while ($user = $req->fetch()){
+				$userO = new UserRepository();
+				$userO->setId($user["send_id"]);
+				$userO->load();
+				$usersArray[] = $userO;
+			}
+		}
+		else{
+			while ($user = $req->fetch()){
+				$userArray = array();
+				$userO = new UserRepository();
+				$userO->setId($user["send_id"]);
+				$userO->load();
+				$userInfo = array();
+				$userArray["date_envoi"] = $user["date_envoi"];
+				$userArray["id"] = $userO->getId();
+				$userArray["pseudo"] = $userO->getPseudo();
+				$userArray["photo_profil"] = $userO->getPhoto_profil();
+				$userArray["bio"] = $userO->getBio();
+				$userArray["actif"] = $userO->getActif();
+				$usersArray[] = $userArray;
+			}
+		}
+
+		return $usersArray;
+	}
+
+	public function annulationDemande($from_id, $to_id){
+		$req = $this->db->prepare("
+			UPDATE demande SET
+			date_annulation=NOW(),
+			actif=FALSE
+			WHERE send_id=?
+			AND receive_id=?
+		");
+		$req->execute(array($from_id, $to_id));
+	}
+
 }

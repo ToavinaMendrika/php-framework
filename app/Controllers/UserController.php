@@ -186,6 +186,50 @@ class UserController extends BaseController
         ));
     }
 
+    public function addUser($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $the_user_to_request = $this->getRequestBody($request, 'user_id');
+
+        $user = new User();
+        $result = $user->addRequest($user_id, $the_user_to_request);
+
+        return $this->renderJson(array(
+            "status" => $result["status"],
+            "message" => $result["message"],
+        ));
+    }
+
+    public function allUsersFromRequest($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $user = new User();
+        $user->setId($user_id);
+
+        $users = $user->getAllUsersFromRequest($array=true);
+
+        return $this->renderJson(array(
+            "nb" => count($users),
+            "users" => $users,
+        ));
+    }
+
     public function getEncodeJwt($data, $key){
         // $tokenId    = base64_encode(mcrypt_create_iv(32));
         $issuedAt   = time();

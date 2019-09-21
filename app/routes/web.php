@@ -18,3 +18,5 @@ $router->get('/chat/discussion/{id}', 'DiscussionController@discussion');
 $router->post('/chat/discussion/{id}', 'DiscussionController@sendMessage');
 $router->get('/user/{id}', 'UserController@userAbout');	// '/user/self' correspond à l'user courant
 $router->post('/user/search', 'UserController@search');
+$router->post('/user/request/add', 'UserController@addUser');
+$router->post('/user/request/all', 'UserController@allUsersFromRequest');
