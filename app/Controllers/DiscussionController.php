@@ -140,7 +140,7 @@ class DiscussionController extends BaseController
         $user_id = $userArray["id"];
         $user_to_send = $this->getRequestBody($request, 'user_id');
         $message_text = $this->getRequestBody($request, 'message');
-        $message_type = "text";
+        $message_type = $this->getRequestBody($request, 'type');
 
         $discussion = new Discussion();
         $discu_id = $discussion->getDiscuIdFromProfil($user_id, $user_to_send);
