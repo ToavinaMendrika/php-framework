@@ -151,4 +151,25 @@ class MessageRepository extends MessageEntity{
 
 		return $isCurrentUser;
 	}
+
+	public function seeMessages($user_id, $discu_id){
+		$req = $this->db->prepare("
+			UPDATE user u
+			INNER JOIN message_vu mv
+			ON u.id=mv.user_id
+			INNER JOIN message m
+			ON mv.message_id=m.id
+			INNER JOIN discussion d
+			ON m.discussion_id=d.id
+			SET
+			mv.is_seen=TRUE,
+			date_seen=NOW()
+			WHERE u.id=?
+			AND d.id=?
+			AND mv.is_seen=FALSE
+		");
+		$req->execute(array($user_id, $discu_id));
+		$count = $req->rowCount();
+		return $count;
+	}
 }

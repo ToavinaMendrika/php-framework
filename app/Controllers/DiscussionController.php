@@ -128,6 +128,44 @@ class DiscussionController extends BaseController
         ));
     }
 
+    public function sendMessageFromProfil($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+        $user_to_send = $this->getRequestBody($request, 'user_id');
+        $message_text = $this->getRequestBody($request, 'message');
+        $message_type = $this->getRequestBody($request, 'type');
+
+        $discussion = new Discussion();
+        $discu_id = $discussion->getDiscuIdFromProfil($user_id, $user_to_send);
+
+        $message = new Message();
+        $message->setMsg_text($message_text);
+        $message->setType($message_type);
+        $message->setUser_id($user_id);
+        $message->setDiscussion_id($discu_id);
+        $message->create();
+
+        $discussion->setId($discu_id);
+        $discussion->load();
+        $discussion->setLast_message($message->getId());
+        $discussion->update();
+
+        $status = "success";
+        $messageJson = "Message sent";
+
+        return $this->renderJson(array(
+            "status" => $status,
+            "message" => $messageJson
+        ));
+    }
+
     public function getEncodeJwt($data, $key){
         // $tokenId    = base64_encode(mcrypt_create_iv(32));
         $issuedAt   = time();

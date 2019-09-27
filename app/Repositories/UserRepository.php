@@ -184,7 +184,30 @@ class UserRepository extends UserEntity{
 		));
 	}
 
-	public function addRequest($from_id, $to_id){
+	public function getNbNotSeen(){
+		$id = $this->getId();
+		$req = $this->db->prepare("
+			SELECT COUNT(id) as nb FROM demande 
+			WHERE actif = TRUE
+			AND is_seen = FALSE
+			AND receive_id = ?
+		");
+		$req->execute(array($id));
+		$nb = $req->fetch();
+		return (int)$nb['nb'];
+	}
+
+	public function isUserIdExists($id){
+		$req = $this->db->prepare("SELECT * FROM user 
+			WHERE id = ?
+		");
+		$req->execute(array($id));
+		$user = $req->fetch();
+		$exists = $user == false ? false : true;
+		return $exists;
+	}
+
+	public function sendRequest($from_id, $to_id){
 		$req = $this->db->prepare("SELECT * FROM demande 
 			WHERE send_id=? 
 			AND receive_id=?
@@ -198,9 +221,15 @@ class UserRepository extends UserEntity{
 			"message" => "",
 		);
 		if ($demande == false){
-			$this->createDemande($from_id, $to_id);
-			$resultat["status"] = "success";
-			$resultat["message"] = "Demande en cours";
+			if ($this->isUserIdExists($to_id)){
+				$this->createDemande($from_id, $to_id);
+				$resultat["status"] = "success";
+				$resultat["message"] = "Demande en cours";
+			}
+			else {
+				$resultat["status"] = "error";
+				$resultat["message"] = "L'utilisateur à envoyer la demande n'existe pas";
+			}
 		}
 		else{
 			$is = $demande["is_accepted"];
@@ -209,9 +238,36 @@ class UserRepository extends UserEntity{
 				$resultat["status"] = "success";
 				$resultat["message"] = "Annulation de la demande";
 			}
+			else if ($is == TRUE){
+				$this->deleteContact($from_id, $to_id);
+				$resultat["status"] = "success";
+				$resultat["message"] = "Suppression du contact";
+			}
 		}
 
 		return $resultat;
+	}
+
+	public function deleteContact($from_id, $to_id){
+		$req = $this->db->prepare("
+			DELETE FROM contact
+			WHERE (user_id=:user_id AND friend_id=:friend_id)
+			OR (user_id=:friend_id AND friend_id=:user_id)
+		");
+		$req->execute(array(
+			"user_id" => $from_id,
+			"friend_id" => $to_id,
+		));
+
+		$req = $this->db->prepare("
+			UPDATE demande SET
+			actif = FALSE,
+			date_suppression_contact = NOW()
+			WHERE send_id=?
+			AND receive_id=?
+			AND actif=TRUE
+		");
+		$req->execute(array($from_id, $to_id));
 	}
 
 	public function createDemande($from_id, $to_id){
@@ -224,6 +280,7 @@ class UserRepository extends UserEntity{
 				date_acceptation,
 				date_refus,
 				date_annulation,
+				is_seen,
 				actif
 			) 
 			VALUES (
@@ -234,6 +291,7 @@ class UserRepository extends UserEntity{
 				NULL,
 				NULL,
 				NULL,
+				FALSE,
 				TRUE
 			)
 		");
@@ -287,8 +345,86 @@ class UserRepository extends UserEntity{
 			actif=FALSE
 			WHERE send_id=?
 			AND receive_id=?
+			AND actif=TRUE
 		");
 		$req->execute(array($from_id, $to_id));
+	}
+
+	public function seeRequests(){
+		$id = $this->getId();
+		$req = $this->db->prepare("
+			UPDATE demande SET
+			is_seen=TRUE
+			WHERE receive_id=?
+			AND actif=TRUE
+		");
+		$req->execute(array($id));
+		$count = $req->rowCount();
+		return $count;
+	}
+
+	public function responseOfRequest($send_id, $accept=true){
+		$id = $this->getId();
+		$req = $this->db->prepare("
+			SELECT * FROM demande
+			WHERE send_id=:send_id
+			AND receive_id=:receive_id
+			AND actif=TRUE 
+		");
+		$req->execute(array(
+			"send_id" => $send_id,
+			"receive_id" => $id,
+		));
+		$demande = $req->fetch();
+		$toModify = $demande["is_accepted"] == NULL ? true : false;
+		if ($accept){
+			$req = $this->db->prepare("
+				UPDATE demande SET
+				is_accepted=TRUE,
+				date_acceptation=NOW()
+				WHERE send_id=:send_id
+				AND receive_id=:receive_id
+				AND actif=TRUE 
+			");
+			$req->execute(array(
+				"send_id" => $send_id,
+				"receive_id" => $id,
+			));
+		}
+		else{
+			$req = $this->db->prepare("
+				UPDATE demande SET
+				is_accepted=FALSE,
+				date_refus=NOW(),
+				actif=FALSE
+				WHERE send_id=:send_id
+				AND receive_id=:receive_id
+				AND actif=TRUE 
+			");
+			$req->execute(array(
+				"send_id" => $send_id,
+				"receive_id" => $id,
+			));
+		}
+
+		$count = $req->rowCount();
+		$is_ok = ($count > 0 AND $toModify)? true : false;
+
+		if ($accept AND $is_ok){
+			$this->addContact($id, $send_id);
+		}
+		return $is_ok;
+	}
+
+	public function addContact($user_id, $friend_id){
+		$req = $this->db->prepare("
+			INSERT INTO contact (user_id, friend_id)
+			VALUES (:user_id, :friend_id), (:friend_id, :user_id)
+		");
+		$req->execute(array(
+			"user_id" => $user_id,
+			"friend_id" => $friend_id,
+		));
 	}
 
 }

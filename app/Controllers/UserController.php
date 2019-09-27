@@ -200,7 +200,7 @@ class UserController extends BaseController
         $the_user_to_request = $this->getRequestBody($request, 'user_id');
 
         $user = new User();
-        $result = $user->addRequest($user_id, $the_user_to_request);
+        $result = $user->sendRequest($user_id, $the_user_to_request);
 
         return $this->renderJson(array(
             "status" => $result["status"],
@@ -223,10 +223,77 @@ class UserController extends BaseController
         $user->setId($user_id);
 
         $users = $user->getAllUsersFromRequest($array=true);
+        $nb_not_seen = $user->getNbNotSeen();
 
         return $this->renderJson(array(
-            "nb" => count($users),
+            "nb_users" => count($users),
+            "nb_not_seen" => $nb_not_seen,
             "users" => $users,
+        ));
+    }
+
+    public function seeRequests($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $status = "success";
+        $message = "";
+
+        $user = new User();
+        $user->setId($user_id);
+        $count = $user->seeRequests();
+        $message = (string)$count . " demandes sont vues";
+
+        return $this->renderJson(array(
+            "status" => $status,
+            "message" => $message,
+        ));
+    }
+
+    public function responseRequest($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $status = "error";
+        $message = "";
+
+        $user = new User();
+        $user->setId($user_id);
+        $response = $this->getRequestBody($request, 'response');
+        $send_id = $this->getRequestBody($request, 'send_id');
+        if ($response == "accept"){
+            $is_ok = $user->responseOfRequest($send_id, $accept=true);
+            if ($is_ok){
+                $status = "success";
+                $message = "Acceptation de la demande";
+            }
+        }
+        // $response == "refuse"
+        else{
+            $is_ok = $user->responseOfRequest($send_id, $accept=false);
+            if ($is_ok){
+                $status = "success";
+                $message = "Refus de la demande";
+            }
+        }
+
+        return $this->renderJson(array(
+            "status" => $status,
+            "message" => $message,
         ));
     }
 

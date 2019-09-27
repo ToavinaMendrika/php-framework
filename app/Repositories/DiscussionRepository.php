@@ -170,4 +170,82 @@ class DiscussionRepository extends DiscussionEntity{
 			"last_message" => $this -> getLast_message(),
 		));
 	}
+
+	public function getDiscuIdFromProfil($user_from, $user_to){
+		$req = $this->db->prepare("
+			SELECT COUNT(d.id) AS nb, d.id AS id FROM discussion d
+			INNER JOIN discussion_user du
+			ON d.id=du.discussion_id
+			WHERE (du.user_id=?
+			OR du.user_id=?)
+			AND d.type='individual'
+            GROUP BY d.id
+		");
+		$req -> execute(array(
+			$user_from,
+			$user_to,
+		));
+		$id = NULL;
+		while ($d = $req->fetch()) {
+			if ($d['nb'] == 2){
+				$id = $d['id'];
+				break;
+			}
+		}
+		if ($id != NULL){
+			return $id;
+		}
+		else{
+			$id = $this->create([$user_from, $user_to]);
+			return $id;
+		}
+	}
+
+	public function create($arrayUsers, $type="individual"){
+		if (!in_array($type, ["individual", "group"])){
+			$type = "individual";
+		}
+		if (empty($arrayUsers)){
+			return NULL;
+		}
+		$req = $this->db->prepare("
+			INSERT INTO discussion (
+				date_creation,
+				type,
+				name,
+				photo_profil,
+				last_message
+			)
+			VALUES (
+				NOW(),
+				:type,
+				NULL,
+				NULL,
+				NULL
+			)
+		");
+		$req -> execute(array(
+			'type' => $type,
+		));
+		$last_id = $this->db->lastInsertId();
+
+		foreach ($arrayUsers as $user_id) {
+			$req = $this->db->prepare("
+				INSERT INTO discussion_user (
+					discussion_id,
+					user_id
+				)
+				VALUES (
+					?,
+					?
+				)
+			");
+			$req -> execute(array(
+				$last_id,
+				$user_id
+			));
+		}
+
+		return $last_id;
+	}
 }
