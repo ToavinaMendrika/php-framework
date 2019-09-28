@@ -10,7 +10,7 @@
                 <span v-for="user in discussion.users">
                   <img v-if="user.id != discussions.current_user_id" :src="'https://api.adorable.io/avatars/45/'+ user.pseudo +'@adorable.png'" alt="">
                 </span> 
-                <span class="not-read" v-if="discussion.notseen !== '0'">{{ discussion.notseen }}</span>
+                <span :class="'not-read nbr-' + discussion.notseen" v-if="discussion.notseen !== '0'">{{ discussion.notseen }}</span>
               </div>
               <div class="discussion-body">
                 <span v-for="user in discussion.users">

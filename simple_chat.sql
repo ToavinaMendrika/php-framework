@@ -157,13 +157,13 @@ INSERT INTO `discussion_user` (`id`, `discussion_id`, `user_id`) VALUES
 DROP TABLE IF EXISTS `message`;
 CREATE TABLE IF NOT EXISTS `message` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `msg_text` text NOT NULL,
+  `msg_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin  NOT NULL,
   `type` varchar(50) NOT NULL,
   `date_envoi` datetime(6) NOT NULL,
   `user_id` int(10) NOT NULL,
   `discussion_id` int(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `message`

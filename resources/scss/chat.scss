@@ -44,6 +44,9 @@ main{
                 align-items: center;
                 width: 17%;
                 .not-read{
+                    &.nbr-0{
+                        display: none;
+                    }
                     display: block;
                     position: absolute;
                     top: 0;
@@ -174,4 +177,8 @@ main{
             border-radius: 50%;
         }
     }
-} 
+}
+.search-wrapper{
+    width: 80%;
+    margin: 0 auto;
+}

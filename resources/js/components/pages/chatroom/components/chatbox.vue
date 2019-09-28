@@ -29,8 +29,15 @@
      
             </div>
             <div class="message-control">
+            <picker 
+              :title="'Simple emoji'" 
+              :exclude="['symbols','objects','places','flags', 'activity']" 
+              :style="{ position: 'absolute', bottom: '50px', right: '20px' , display: displayEmojis}"
+              @select="addEmoji"
+             /> 
               <form action="" method="post" @submit.prevent="sendMessage">
-                <input class="input" type="text" placeholder="Message" data-emoji-picker="true" v-model="newMessage.message">
+                <input style="width:97%" class="input" type="text" placeholder="Message" data-emoji-picker="true" v-model="newMessage.message">
+                <i class="fas fa-plus" @click="showEmojis"></i>
               </form>
             </div>
           </div>
@@ -40,7 +47,8 @@
           <div class="about-header has-text-centered">
             <img class="avatar" src="https://api.adorable.io/avatars/45/toavina@adorable.png" alt="">
           </div>
-          <p class="has-text-centered">    
+          <p class="has-text-centered">   
+         
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quaerat fugiat dolorum quidem possimus, quas hic veritatis 
           </p>
           <p class="has-text-centered">
@@ -87,15 +95,23 @@
           </div>
         </div>
       </div>
+
         </div>
     </div>
 </template>
 <script>
     import axios from 'axios'
+    import store from '../../../../store/discussionStore'
+    import { Picker } from 'emoji-mart-vue'
     const qs = require('querystring')
-    export default {      
+    export default {
+        store: store,
+        components: {
+          Picker
+        },
         data(){
             return {
+                displayEmojis: 'none',
                 newMessage: {
                     message: '',
                     type: 'text',
@@ -129,29 +145,30 @@
                 })
                 .then((response)=>  {
                         
-                        this.messages = response.data.messages
-                        this.current_user = response.data.current_user_id
-                        this.newMessage.user.id = response.data.current_user_id
-                        this.current_discussion.users = []
-                        this.current_discussion.avatars = []
-                        window.setTimeout(function(){
-                            document.getElementById('message-box').scrollTop = document.getElementById('message-box').scrollHeight
-                        },1000)
-                        response.data.messages.forEach((message) =>{
-                            let avatar = message.user.photo_profil
-                            let pseudo = message.user.pseudo
-                            let defaultAvatar = 'https://api.adorable.io/avatars/45/'+pseudo+'@adorable.png'
-                            if(!this.current_discussion.users.includes(pseudo)){
-                                this.current_discussion.users.push(pseudo)
-                            }
-                            /*
-                            if(!this.current_discussion.avatars.includes(avatar) || !this.current_discussion.avatars.includes(defaultAvatar)  && avatar !== null){
-                                this.current_discussion.avatars.push(avatar)
-                            }
-                            else{          
-                                this.current_discussion.avatars.push(defaultAvatar)
-                            }*/
-                        })
+                    this.messages = response.data.messages
+                    this.current_user = response.data.current_user_id
+                    this.newMessage.user.id = response.data.current_user_id
+                    this.current_discussion.users = []
+                    this.current_discussion.avatars = []
+                    window.setTimeout( ()=>{
+                        document.getElementById('message-box').scrollTop = document.getElementById('message-box').scrollHeight
+                        this.seenMessage(discussionId)
+                    },1000)
+                    response.data.messages.forEach((message) =>{
+                        let avatar = message.user.photo_profil
+                        let pseudo = message.user.pseudo
+                        let defaultAvatar = 'https://api.adorable.io/avatars/45/'+pseudo+'@adorable.png'
+                        if(!this.current_discussion.users.includes(pseudo)){
+                            this.current_discussion.users.push(pseudo)
+                        }
+                        /*
+                        if(!this.current_discussion.avatars.includes(avatar) || !this.current_discussion.avatars.includes(defaultAvatar)  && avatar !== null){
+                            this.current_discussion.avatars.push(avatar)
+                        }
+                        else{          
+                            this.current_discussion.avatars.push(defaultAvatar)
+                        }*/
+                    })
                 })
             },
 
@@ -175,8 +192,25 @@
                 .then((response)=>  {
                         this.newMessage.message = ''
                         document.getElementById('message-box').scrollTop = document.getElementById('message-box').scrollHeight
-                        console.log(response)
+                        
                 })
+            },
+
+            seenMessage(discussionId){
+              store.dispatch('seenMessage', discussionId)
+            },
+
+            addEmoji(emoji){
+              this.newMessage.message += emoji.native
+            },
+
+            showEmojis(){
+              if(this.displayEmojis == 'block'){
+                this.displayEmojis = 'none'
+              }
+              else{
+                this.displayEmojis = 'block'
+              }
             }
 
         },
