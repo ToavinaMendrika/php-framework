@@ -28,7 +28,7 @@ class MessageEntity {
 	}
 
 	public function setMsg_Text($msg_text){
-		$this->msg_text = utf8_encode($msg_text);
+		$this->msg_text = $msg_text;
 	}
 
 	public function getDate_envoi(){
