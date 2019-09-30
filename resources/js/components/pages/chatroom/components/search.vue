@@ -21,7 +21,7 @@
                         <div class="media-content">
                             <div class="content">
                                 <p>
-                                    <strong>{{ user.pseudo }}</strong> <small>@{{ user.pseudo}}</small> <small>31m</small>
+                                    <strong>{{ user.pseudo }}</strong> <router-link :to="{name: 'chat_user', params: {id: user.id} }"><small>@{{ user.pseudo}}</small></router-link> <small>31m</small>
                                     <br>
                                     {{ user.bio }}
                                 </p>

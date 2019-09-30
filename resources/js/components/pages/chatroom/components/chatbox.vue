@@ -8,8 +8,8 @@
                 <img class="avatar" :src="avatar" alt="">
               </span>
               <span class="discussion-title">
-                <span v-for="user in current_discussion.users">
-                    {{user}}
+                <span v-for="user in current_discussion.users" v-if="!user.is_current_user">
+                    {{user.pseudo}}
                 </span>
               </span>
             </div>
@@ -32,7 +32,8 @@
             <picker 
               :title="'Simple emoji'" 
               :exclude="['symbols','objects','places','flags', 'activity']" 
-              :style="{ position: 'absolute', bottom: '50px', right: '20px' , display: displayEmojis}"
+              :style="{ position: 'absolute', bottom: '50px', right: '20px'}"
+              v-show="displayEmojis"
               @select="addEmoji"
              /> 
               <form action="" method="post" @submit.prevent="sendMessage">
@@ -42,60 +43,12 @@
             </div>
           </div>
       </div>
-      <div class="column is-one-quarter">
-        <div class="bordered about">
-          <div class="about-header has-text-centered">
-            <img class="avatar" src="https://api.adorable.io/avatars/45/toavina@adorable.png" alt="">
-          </div>
-          <p class="has-text-centered">   
-         
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quaerat fugiat dolorum quidem possimus, quas hic veritatis 
-          </p>
-          <p class="has-text-centered">
-            <a href="#" class="button is-info">Voir le profil</a>
-          </p>
-          <hr>
-          <div class="invite">
-            <p>Inviter: </p>
-            <div class="control">
-              <input type="text" class="input" placeholder="Inviter ...">
-            </div>
-            <div class="result">
-                <div class="card">
-                  <div class="card-content">
-                    <div class="columns">
-                        <div class="column">
-                          <img src="https://api.adorable.io/avatars/45/toavina@adorable.png" alt="">
-                        </div>
-                        <div class="column">
-                          <p>John Doe</p>
-                        </div>
-                        <div class="column">
-                          <button class="button is-info">Ajouter</button>
-                        </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-content">
-                    <div class="columns">
-                        <div class="column">
-                          <img src="https://api.adorable.io/avatars/45/toavina@adorable.png" alt="">
-                        </div>
-                        <div class="column">
-                          <p>John Doe</p>
-                        </div>
-                        <div class="column">
-                          <button class="button is-info">Ajouter</button>
-                        </div>
-                    </div>
-                  </div>
-                </div>             
-            </div>
+        <div class="column is-one-quarter">
+          <div class="bordered about has-text-centered">
+            <user-profil :user-id="other_user" v-if="other_user != null"/>
+            <router-link class="button is-info" :to="{name: 'chat_user', params: {id: other_user}}" v-if="other_user != null">Voir profil</router-link>
           </div>
         </div>
-      </div>
-
         </div>
     </div>
 </template>
@@ -103,23 +56,26 @@
     import axios from 'axios'
     import store from '../../../../store/discussionStore'
     import { Picker } from 'emoji-mart-vue'
+    import UserProfil from './userProfile'
     const qs = require('querystring')
     export default {
         store: store,
         components: {
-          Picker
+          Picker,
+          UserProfil
         },
         data(){
             return {
-                displayEmojis: 'none',
+                displayEmojis: false,
                 newMessage: {
                     message: '',
                     type: 'text',
-                    user: {
-                        id: null
+                    user:{
+                      id: null
                     }
                 },
                 current_user: null,
+                other_user: null,
                 messages: [],
                 current_discussion: {
                     users: [],
@@ -127,13 +83,22 @@
                 }
             }
         },
-        mounted(){
-            if(window.localStorage.getItem('token') === null){
+        created(){
+          if(window.localStorage.getItem('token') === null){
                 this.$router.push({name: 'login'})
             }
             else{
+              if(this.$route.params.id == 'new'){
+                this.current_discussion.users.push({
+                  pseudo: 'Nouvelle discussion'
+                })
+              }else{
                 this.getMessages(this.$route.params.id)
+              }
             }
+        },
+        mounted(){
+            
         },
         methods: {
             getMessages(discussionId){
@@ -154,13 +119,21 @@
                         document.getElementById('message-box').scrollTop = document.getElementById('message-box').scrollHeight
                         this.seenMessage(discussionId)
                     },1000)
+                    let current_user = []
                     response.data.messages.forEach((message) =>{
-                        let avatar = message.user.photo_profil
-                        let pseudo = message.user.pseudo
-                        let defaultAvatar = 'https://api.adorable.io/avatars/45/'+pseudo+'@adorable.png'
-                        if(!this.current_discussion.users.includes(pseudo)){
-                            this.current_discussion.users.push(pseudo)
+                        if(!current_user.includes(message.user.id)){
+                          current_user.push(message.user.id)
+                          let user = {
+                            is_current_user: message.user.id == this.current_user,
+                            ...message.user
+                          }
+                          if(!user.is_current_user){
+                            this.other_user = user.id
+                          }
+                          this.current_discussion.users.push(user)
                         }
+                       
+                        
                         /*
                         if(!this.current_discussion.avatars.includes(avatar) || !this.current_discussion.avatars.includes(defaultAvatar)  && avatar !== null){
                             this.current_discussion.avatars.push(avatar)
@@ -169,20 +142,26 @@
                             this.current_discussion.avatars.push(defaultAvatar)
                         }*/
                     })
+                    console.log(this.current_discussion)
+                    console.log(this.other_user)
                 })
             },
 
             sendMessage(){
-                let uri = '/chat/discussion/' + this.$route.params.id
+                
+                let uri = this.$route.params.id != 'new' ? '/chat/discussion/' + this.$route.params.id : '/chat/discussion_profil'
                 let newMessage = {
                     type: this.newMessage.type,
                     msg_text: this.newMessage.message,
                     user: {
-                        id: this.newMessage.user.id
-                    }
+                      id: this.newMessage.user.id 
+                    } 
+
+                }
+                if( this.$route.params.id == 'new' ){
+                  this.newMessage.user_id =  store.getters.discussions.discussions[0].users[0].id
                 }
                 this.messages.push(newMessage)
-                
                 axios.post(uri, qs.stringify(this.newMessage),{
                      headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -205,12 +184,7 @@
             },
 
             showEmojis(){
-              if(this.displayEmojis == 'block'){
-                this.displayEmojis = 'none'
-              }
-              else{
-                this.displayEmojis = 'block'
-              }
+              this.displayEmojis = !this.displayEmojis
             }
 
         },

@@ -18,6 +18,9 @@ const store = new Vuex.Store({
         addDiscussions(state, discussions){
             state.discussions = discussions
         },
+        addDiscussion(state, discussion){
+            state.discussions.discussions.unshift(discussion)
+        },
 
         seenMessage(state, discussionId){
             state.discussions.discussions.forEach(discussion => {
@@ -71,7 +74,12 @@ const store = new Vuex.Store({
                 }
             })
             
+        },
+
+        addDiscussion(context, discussion){
+            context.commit('addDiscussion', discussion)
         }
+
     }
 })
 

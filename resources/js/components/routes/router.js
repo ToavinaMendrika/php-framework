@@ -4,6 +4,8 @@ import Login from './../pages/Login'
 import Chat from './../pages/chatroom/chat'
 import Search from './../pages/chatroom/components/search'
 import ChatBox from './../pages/chatroom/components/chatbox'
+import Contacts from './../pages/chatroom/components/contacts'
+import User from './../pages/chatroom/components/user'
 
 const router = new VueRouter(
     {
@@ -33,7 +35,18 @@ const router = new VueRouter(
                          path: ':id',
                          name: 'chat_box',
                          component: ChatBox,
+                    },
+                    {
+                        path: 'contacts',
+                        name: 'chat_contacts',
+                        component: Contacts,
+                    },
+                    {
+                        path: 'user/:id',
+                        name: 'chat_user',
+                        component: User
                     }
+                    
                  ]
             }
 

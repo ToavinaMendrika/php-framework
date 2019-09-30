@@ -15,15 +15,8 @@
         
             <div id="navbarBasicExample" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item">
-                Home
-                </a>
-        
-                <a class="navbar-item">
-                Documentation
-                </a>
-        
-                
+                <router-link :to="{name: 'chat_home'}" class="navbar-item">Home</router-link>
+                <router-link :to="{name: 'chat_contacts'}" class="navbar-item">Contacts</router-link>   
             </div>
         
             <div class="navbar-end">
