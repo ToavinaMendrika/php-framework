@@ -114,7 +114,7 @@ class DiscussionRepository extends DiscussionEntity{
 	public function getLast_messageArray(){
 		$id = $this->getId();
 		$req = $this->db->prepare("
-			SELECT * FROM message m
+			SELECT m.* FROM message m
 			INNER JOIN discussion d
 			ON m.id=d.last_message
 			WHERE d.id=?

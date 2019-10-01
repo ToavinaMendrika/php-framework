@@ -116,6 +116,7 @@ class UserController extends BaseController
             $found = true;
 
             $userJson = array();
+            $userJson['is_friend'] = $user->isFriendOf($user_id);
             $userJson['id'] = $user->getId();
             $userJson['pseudo'] = $user->getPseudo();
             $userJson['email'] = $user->getEmail();
@@ -171,9 +172,12 @@ class UserController extends BaseController
         $usersJson = array();
         foreach ($result as $u) {
             $uArr = array();
+            $is_friend = $u->isFriendOf($user_id);
             $uArr["is_current_user"] = $u->getId() == $user_id ? true : false;
+            $uArr["is_friend"] = $is_friend;
             $uArr["id"] = $u->getId();
             $uArr["pseudo"] = $u->getPseudo();
+            $uArr["email"] = $u->getEmail();
             $uArr["photo_profil"] = $u->getPhoto_profil();
             $uArr["bio"] = $u->getBio();
             $uArr["actif"] = $u->getActif();

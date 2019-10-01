@@ -427,4 +427,35 @@ class UserRepository extends UserEntity{
 		));
 	}
 
+	public function isFriendOf($user_id){
+		$id = $this->getId();
+		$req = $this->db->prepare("SELECT * FROM demande 
+			WHERE ((send_id=:send_id 
+			AND receive_id=:receive_id)
+			OR (send_id=:receive_id 
+			AND receive_id=:send_id))
+			AND actif=TRUE
+		");
+		$req->execute(array(
+			'send_id' => $id,
+			'receive_id' => $user_id,
+		));
+		$demande = $req->fetch();
+
+		$is_friend = "false";
+		if ($demande == false){
+			$is_friend = "false";
+		}		
+		else{
+			if ($demande['is_accepted'] == true){
+				$is_friend = "true";
+			}
+			else if ($demande['is_accepted'] == null){
+				$is_friend = $demande['send_id'] == $user_id ? "en cours d'envoi" : "en cours de réception";
+			}
+		}
+
+		return $is_friend;
+	}
+
 }
