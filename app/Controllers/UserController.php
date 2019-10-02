@@ -301,6 +301,158 @@ class UserController extends BaseController
         ));
     }
 
+    public function editUser($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $status = "error";
+        $lastValue = "";
+        $newValue = "";
+
+        $toEdit = $this->getRequestBody($request, 'toEdit');
+        $value = $this->getRequestBody($request, 'value');
+
+        $user = new User();
+        $user->setId($user_id);
+        $user->load();
+
+        switch ($toEdit) {
+            case 'pseudo':
+                if (isset($value) AND $value != ""){
+                    $lastValue = $user->getPseudo();
+                    $user->setPseudo($value);
+                    $newValue = $user->getPseudo();
+                    $user->update();
+                    $status = "success";
+                }
+                break;
+            case 'password':
+                if (isset($value) AND $value != ""){
+                    $lastValue = $user->getPassword();
+                    $user->setPassword($value);
+                    $newValue = $user->getPassword();
+                    $user->update();
+                    $status = "success";
+                }
+                break;
+            case 'bio':
+                if (isset($value) AND $value != ""){
+                    $lastValue = $user->getBio();
+                    $user->setBio($value);
+                    $newValue = $user->getBio();
+                    $user->update();
+                    $status = "success";
+                }
+                break;
+            default:
+                break;
+        }
+
+        return $this->renderJson(array(
+            "status" => $status,
+            "to_edit" => $toEdit,
+            "last_value" => $lastValue,
+            "new_value" => $newValue,
+        ));
+    }
+
+    public function verifyPassword($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+        $password = $this->getRequestBody($request, 'password');
+
+        $user = new User();
+        $user->setId($user_id);
+        $user->setPassword($password);
+        $is_password_true = $user->isPasswordTrue();
+
+        return $this->renderJson(array(
+            "is_password_true" => $is_password_true,
+        ));
+    }
+
+    public function editUserPhoto($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $status = "error";
+        $message = "";
+        $lastValue = array();
+        $newValue = array();
+
+        $maxSize = 1000000; //octet
+
+        $photo = $this->getUploadedFiles($request, 'photo');
+
+        if ($photo AND $photo->getError() == 0){
+            if ($photo->getSize() <= $maxSize){
+                $infosFichier = pathinfo($photo->getClientFileName());
+                $extension = $infosFichier['extension'];
+                $extensionsAuorisees = array('jpg','jpeg','gif','png');
+                if (in_array($extension, $extensionsAuorisees)){
+                    $newFileName = $user_id . date('YmdHis') . '.' . $extension;
+                    $destinationPath = $_SERVER['DOCUMENT_ROOT'] . '/simple-chat/public/images/user/';
+                    move_uploaded_file($photo->getFile(), $destinationPath.$newFileName);
+
+                    $user = new User();
+                    $user->setId($user_id);
+                    $user->load();
+                    $lastIdPhoto = $user->getPhoto_profil();
+                    $lastValue = $user->getPhotoInfo($lastIdPhoto);
+                    $id_photo = $user->updatePhotoProfil($newFileName);
+                    $user->setPhoto_profil($id_photo);
+                    $user->update();
+                    $newIdPhoto = $user->getPhoto_profil();
+                    $newValue = $user->getPhotoInfo($newIdPhoto);
+
+                    $status = "success";
+                }
+                else{
+                    $message = "Extension non autorisée";
+                }
+            }
+            else{
+                $message = "Max taille fichier : " . (string)$maxSize . " (octet)";
+            }
+        }
+        else {
+            if ($photo){
+                $message = "Error code : " . (string)$photo->getError();
+            }
+            else{
+                $message = "Fichier inexistant";
+            }
+        }
+
+        return $this->renderJson(array(
+            "status" => $status,
+            "message" => $message,
+            "last_value" => $lastValue,
+            "new_value" => $newValue,
+        ));
+    }
+
     public function getEncodeJwt($data, $key){
         // $tokenId    = base64_encode(mcrypt_create_iv(32));
         $issuedAt   = time();

@@ -89,3 +89,22 @@ $router->post('/chat/message/seen', 'MessageController@seeMessages');
 * type: "text"/"media"
 */
 $router->post('/chat/discussion_profil', 'DiscussionController@sendMessageFromProfil');
+
+/*
+* Authorization: jwt
+* toEdit: "pseudo"/"password"/"bio"
+* value: value of the field to update
+*/
+$router->post('/user_profil/edit', 'UserController@editUser');
+
+/*
+* Authorization: jwt
+* password: the password to check if it matches
+*/
+$router->post('/user_profil/verify_password', 'UserController@verifyPassword');
+
+/*
+* Authorization: jwt
+* photo: the file for updating photo de profil
+*/
+$router->post('/user_profil/editPhoto', 'UserController@editUserPhoto');

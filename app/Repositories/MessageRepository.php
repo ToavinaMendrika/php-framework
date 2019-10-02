@@ -37,14 +37,14 @@ class MessageRepository extends MessageEntity{
 			"discu_id" => $discu_id,
 		));
 
+		$lastId = $this->db->lastInsertId();
+
 		$req = $this->db->prepare("SELECT * FROM message WHERE 
-			user_id=:user_id 
-			AND discussion_id=:discu_id
+			id=?
 			ORDER BY date_envoi DESC
 		");
 		$req -> execute(array(
-			"user_id" => $user_id,
-			"discu_id" => $discu_id,
+			$lastId,
 		));
 		$message = $req->fetch();
 		$this->setId($message['id']);
