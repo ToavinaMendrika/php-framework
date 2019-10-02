@@ -48,11 +48,29 @@ class MessageRepository extends MessageEntity{
 		));
 		$message = $req->fetch();
 		$this->setId($message['id']);
+		$this->setDate_envoi($message['date_envoi']);
 
 		// Modification (insertion) de la table message_vu
 		$this->initiateMessage_vu();
 
 		return $this;
+	}
+
+	public function getArrayVersion(){
+		$req = $this->db->prepare("SELECT * FROM message WHERE 
+			id=? 
+		");
+		$req -> execute(array(
+			$this->getId(),
+		));
+		$message = $req->fetch();
+		$messageArray = array();
+		foreach ($message as $key => $value) {
+			if ($key != "0" AND (int)$key == 0){
+				$messageArray[$key] = $value;
+			}
+		}
+		return $messageArray;
 	}
 
 	public function getDiscussion(){

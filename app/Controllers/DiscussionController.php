@@ -119,12 +119,16 @@ class DiscussionController extends BaseController
         $discussion->setLast_message($message->getId());
         $discussion->update();
 
+        $message_user = $message->getArrayVersion();
+
         $status = "success";
         $messageJson = "Message sent";
 
         return $this->renderJson(array(
             "status" => $status,
-            "message" => $messageJson
+            "message" => $messageJson,
+            "message_user" => $message_user,
+            "discussion_id" => $discu_id,
         ));
     }
 
