@@ -74,7 +74,7 @@
            .then((response)=>  {
               this.currentUser = response.data.user
               console.log(this.currentUser)
-              this.$socket.emit('user_connection', {user: this.currentUser})
+              this.$socket.emit('user_connection', this.currentUser)
            })
            .catch(function (error) {
                console.log(error);

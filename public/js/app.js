@@ -2851,9 +2851,7 @@ __webpack_require__.r(__webpack_exports__);
       _this.currentUser = response.data.user;
       console.log(_this.currentUser);
 
-      _this.$socket.emit('user_connection', {
-        user: _this.currentUser
-      });
+      _this.$socket.emit('user_connection', _this.currentUser);
     })["catch"](function (error) {
       console.log(error);
     });
@@ -62207,7 +62205,7 @@ Vue.component('datacar', require('./components/Datacar.vue'));*/
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(new vue_socket_io__WEBPACK_IMPORTED_MODULE_3___default.a({
   debug: true,
-  connection: 'http://local.simple-chat.com:3000',
+  connection: 'http://localhost:3000',
   vuex: {
     store: _store_discussionStore__WEBPACK_IMPORTED_MODULE_4__["default"],
     actionPrefix: 'SOCKET_',

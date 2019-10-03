@@ -21,12 +21,12 @@ Vue.component('datacar', require('./components/Datacar.vue'));*/
 Vue.use(VueRouter)
 Vue.use(new VueSocketIO({
   debug: true,
-  connection: 'http://local.simple-chat.com:3000',
+  connection: 'http://localhost:3000',
   vuex: {
       store,
       actionPrefix: 'SOCKET_',
       mutationPrefix: 'SOCKET_'
-  },
+  }
 }))
 
 //const store = require('./store/discussionStore')
