@@ -42,4 +42,14 @@ class BaseController
         }
     }
 
+    public function getUploadedFiles(ServerRequestInterface $request, string $key)
+    {        
+        if (isset($request->getUploadedFiles()[$key])){
+            return $request->getUploadedFiles()[$key];
+        }
+        else{
+            return null;
+        }
+    }
+
 }

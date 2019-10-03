@@ -55,10 +55,8 @@ class UserRepository extends UserEntity{
 			"email" => $email,
 		));
 
-		$req = $this->db->prepare("SELECT * FROM user WHERE email=?");
-		$req->execute(array($email));
-		$user = $req->fetch();
-		$this->setId($user['id']);
+		$lastId = $this->db->lastInsertId();
+		$this->setId($lastId);
 
 		return $this;
 	}
@@ -182,6 +180,56 @@ class UserRepository extends UserEntity{
 			"bio" => $this -> getBio(),
 			"actif" => $this -> getActif(),
 		));
+	}
+
+	public function updatePhotoProfil($fileName){
+		$req = $this->db->prepare("
+			INSERT INTO photo_profil (
+				name_photo,
+				date_creation,
+				type,
+				user_discussion_id
+			)
+			VALUES (
+				:name_photo,
+				NOW(),
+				'user',
+				:id
+			)
+		");
+		$req -> execute(array(
+			"id" => $this -> getId(),
+			"name_photo" => $fileName,
+		));
+
+		$lastId = $this->db->lastInsertId();
+
+		return $lastId;
+	}
+
+	public function getPhotoInfo($photo_id){
+		if ($photo_id == null){
+			return array();
+		}
+		$req = $this->db->prepare("
+			SELECT * FROM photo_profil
+			WHERE id=?
+		");
+		$req -> execute(array(
+			$photo_id,
+		));
+
+		$photo = $req->fetch();
+		$photoArray = array();
+		foreach ($photo as $key => $value) {
+			if ($key != "0" AND (int)$key == 0){
+				$photoArray[$key] = $value;
+			}
+		}
+		$link = $_SERVER['APP_URL'] . '/simple-chat/public/images/user/' . $photoArray['name_photo'];
+		$photoArray["link_photo"] = $link;
+
+		return $photoArray;
 	}
 
 	public function getNbNotSeen(){
@@ -330,6 +378,7 @@ class UserRepository extends UserEntity{
 				$userArray["id"] = $userO->getId();
 				$userArray["pseudo"] = $userO->getPseudo();
 				$userArray["photo_profil"] = $userO->getPhoto_profil();
+				$userArray["photo_link"] = $userO->getPhotoInfo($userO->getPhoto_profil());
 				$userArray["bio"] = $userO->getBio();
 				$userArray["actif"] = $userO->getActif();
 				$usersArray[] = $userArray;
@@ -457,6 +506,77 @@ class UserRepository extends UserEntity{
 		}
 
 		return $is_friend;
+	}
+
+	public function isPasswordTrue(){
+		$id = $this->getId();
+		$password = $this->getPassword();
+		$req = $this->db->prepare("SELECT * FROM user 
+			WHERE id=?
+			AND password=?
+		");
+		$req->execute(array(
+			$id,
+			$password,
+		));
+		$user = $req->fetch();
+		if ($user == false){
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	public function getArrayVersion(){
+		$req = $this->db->prepare("SELECT * FROM user WHERE 
+			id=? 
+		");
+		$req -> execute(array(
+			$this->getId(),
+		));
+		$user = $req->fetch();
+		$userArray = array();
+		foreach ($user as $key => $value) {
+			if ($key != "0" AND (int)$key == 0){
+				$userArray[$key] = $value;
+			}
+		}
+		return $userArray;
+	}
+
+	public function getListContact($user_id){
+		$req = $this->db->prepare("
+			SELECT u.* FROM user u
+			INNER JOIN contact c
+			ON u.id=c.friend_id
+			WHERE c.user_id=?
+			ORDER BY u.pseudo ASC
+		");
+		$req->execute(array(
+			$user_id,
+		));
+
+		$userArray = array();
+		while ($friend = $req->fetch()){
+			$user = new UserRepository();
+			$user->setId($friend["id"]);
+			$uArr = $user->getArrayVersion();
+			unset($uArr["password"]);
+			$uArr["photo_info"] = $user->getPhotoInfo($uArr["photo_profil"]);
+			$userArray[] = $uArr;
+		}
+		return $userArray;
+	}
+
+	public function getNbFriends($user_id){
+		$req = $this->db->prepare("
+			SELECT COUNT(id) as nb FROM contact 
+			WHERE user_id=?
+		");
+		$req->execute(array($user_id));
+		$nb = $req->fetch();
+		return (int)$nb['nb'];
 	}
 
 }

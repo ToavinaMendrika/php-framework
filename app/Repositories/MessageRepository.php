@@ -37,22 +37,40 @@ class MessageRepository extends MessageEntity{
 			"discu_id" => $discu_id,
 		));
 
+		$lastId = $this->db->lastInsertId();
+
 		$req = $this->db->prepare("SELECT * FROM message WHERE 
-			user_id=:user_id 
-			AND discussion_id=:discu_id
+			id=?
 			ORDER BY date_envoi DESC
 		");
 		$req -> execute(array(
-			"user_id" => $user_id,
-			"discu_id" => $discu_id,
+			$lastId,
 		));
 		$message = $req->fetch();
 		$this->setId($message['id']);
+		$this->setDate_envoi($message['date_envoi']);
 
 		// Modification (insertion) de la table message_vu
 		$this->initiateMessage_vu();
 
 		return $this;
+	}
+
+	public function getArrayVersion(){
+		$req = $this->db->prepare("SELECT * FROM message WHERE 
+			id=? 
+		");
+		$req -> execute(array(
+			$this->getId(),
+		));
+		$message = $req->fetch();
+		$messageArray = array();
+		foreach ($message as $key => $value) {
+			if ($key != "0" AND (int)$key == 0){
+				$messageArray[$key] = $value;
+			}
+		}
+		return $messageArray;
 	}
 
 	public function getDiscussion(){
@@ -128,9 +146,11 @@ class MessageRepository extends MessageEntity{
 		$userArray = $req->fetch();
 
 		$user = array();
+		$userObj = new UserRepository();
 		$user["id"] = $userArray["user_id"];
 		$user["pseudo"] = $userArray["pseudo"];
 		$user["photo_profil"] = $userArray["photo_profil"];
+		$user["photo_info"] = $userObj->getPhotoInfo($userArray["photo_profil"]);
 
 		return $user;
 	}
@@ -171,5 +191,13 @@ class MessageRepository extends MessageEntity{
 		$req->execute(array($user_id, $discu_id));
 		$count = $req->rowCount();
 		return $count;
+	}
+
+	public function getMessageMediaLink($media_name=null){
+		if ($media_name == null){
+			return null;
+		}
+		$link = $_SERVER['APP_URL'] . '/simple-chat/public/images/message/' . $media_name;
+		return $link;
 	}
 }

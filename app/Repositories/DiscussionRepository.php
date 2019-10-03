@@ -55,11 +55,13 @@ class DiscussionRepository extends DiscussionEntity{
 		$req->execute(array($id));
 
 		$usersArray = array();
+		$userObj = new UserRepository();
 		while ($userArray = $req->fetch()){
 			$user = array();
 			$user["id"] = $userArray["user_id"];
 			$user["pseudo"] = $userArray["pseudo"];
 			$user["photo_profil"] = $userArray["photo_profil"];
+			$user["photo_info"] = $userObj->getPhotoInfo($userArray["photo_profil"]);
 			$user["actif"] = $userArray["actif"];
 			$usersArray[] = $user;
 		}
@@ -132,6 +134,12 @@ class DiscussionRepository extends DiscussionEntity{
 		$messageArray["type"] = $message["type"];
 		$messageArray["user_id"] = $message["user_id"];
 		$messageArray["discussion_id"] = $message["discussion_id"];
+		$mObj = new MessageRepository();
+		$link = null;
+		if ($message["type"] == "media"){
+			$link = $mObj->getMessageMediaLink($message["msg_text"]);
+		}
+		$messageArray["link"] = $link;
 
 		return $messageArray;
 	}
