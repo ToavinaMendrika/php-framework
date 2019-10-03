@@ -122,6 +122,7 @@ class UserController extends BaseController
             $userJson['email'] = $user->getEmail();
             $userJson['date_creation'] = $user->getDate_creation();
             $userJson['photo_profil'] = $user->getPhoto_profil();
+            $userJson['photo_info'] = $user->getPhotoInfo($user->getPhoto_profil());
             $userJson['bio'] = $user->getBio();
             $userJson['actif'] = $user->getActif();
             $userJson['date_last_modification'] = $user->getDate_last_modification();
@@ -179,6 +180,7 @@ class UserController extends BaseController
             $uArr["pseudo"] = $u->getPseudo();
             $uArr["email"] = $u->getEmail();
             $uArr["photo_profil"] = $u->getPhoto_profil();
+            $uArr["photo_info"] = $u->getPhotoInfo($u->getPhoto_profil());
             $uArr["bio"] = $u->getBio();
             $uArr["actif"] = $u->getActif();
             $usersJson[] = $uArr;
@@ -413,7 +415,8 @@ class UserController extends BaseController
                 if (in_array($extension, $extensionsAuorisees)){
                     $newFileName = $user_id . date('YmdHis') . '.' . $extension;
                     $destinationPath = $_SERVER['DOCUMENT_ROOT'] . '/simple-chat/public/images/user/';
-                    move_uploaded_file($photo->getFile(), $destinationPath.$newFileName);
+                    // move_uploaded_file($photo->getFile(), $destinationPath.$newFileName);
+                    $photo->moveTo($destinationPath.$newFileName);
 
                     $user = new User();
                     $user->setId($user_id);
@@ -450,6 +453,37 @@ class UserController extends BaseController
             "message" => $message,
             "last_value" => $lastValue,
             "new_value" => $newValue,
+        ));
+    }
+
+    public function listContact($request){
+        $userArray = $this->verify_token($request);
+        if ($userArray==false){
+            return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
+                "status" => "error",
+                "message" => "Invalid authorized access"
+            )));
+        }
+
+        $user_id = $userArray["id"];
+
+        $user_id_contact_list = $this->getRequestBody($request, 'user_id');
+        if ($user_id_contact_list == "self"){
+            $user_id_contact_list = $user_id;
+        }
+
+        $status = "success";
+        $listContact = array();
+        $nb = 0;
+
+        $user = new User();
+        $listContact = $user->getListContact($user_id_contact_list);
+        $nb = $user->getNbFriends($user_id_contact_list);
+
+        return $this->renderJson(array(
+            "status" => $status,
+            "nb" => $nb,
+            "list_contact" => $listContact,
         ));
     }
 

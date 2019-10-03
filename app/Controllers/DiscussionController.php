@@ -82,6 +82,11 @@ class DiscussionController extends BaseController
             $messageArray = array();
             $messageArray["type"] = $message->getType();
             $messageArray["msg_text"] = $message->getMsg_text();
+            $link = null;
+            if ($messageArray["type"] == "media"){
+                $link = $message->getMessageMediaLink($messageArray["msg_text"]);
+            }
+            $messageArray["link"] = $link;
             $messageArray["date"] = $message->getDate_envoi();
             $messageArray["user"] = $message->getUserNecessityArray();
             array_push($messagesJson, $messageArray);
@@ -106,23 +111,74 @@ class DiscussionController extends BaseController
         $message_text = $this->getRequestBody($request, 'message');
         $message_type = $this->getRequestBody($request, 'type');
 
-        $message = new Message();
-        $message->setMsg_text($message_text);
-        $message->setType($message_type);
-        $message->setUser_id($user_id);
-        $message->setDiscussion_id($discu_id);
-        $message->create();
-
-        $discussion = new Discussion();
-        $discussion->setId($discu_id);
-        $discussion->load();
-        $discussion->setLast_message($message->getId());
-        $discussion->update();
-
-        $message_user = $message->getArrayVersion();
-
         $status = "success";
         $messageJson = "Message sent";
+        $message_user = null;
+        $link = null;
+
+        $uploaded = false;
+
+        $maxSize = 1000000; //octet
+
+        if ($message_type == "media"){
+            $media = $this->getUploadedFiles($request, 'media');
+
+            if ($media AND $media->getError() == 0){
+                if ($media->getSize() <= $maxSize){
+                    $infosFichier = pathinfo($media->getClientFileName());
+                    $extension = $infosFichier['extension'];
+                    $extensionsAuorisees = array('jpg','jpeg','gif','png');
+                    if (in_array($extension, $extensionsAuorisees)){
+                        $newFileName = 'm' . $user_id . date('YmdHis') . '.' . $extension;
+                        $destinationPath = $_SERVER['DOCUMENT_ROOT'] . '/simple-chat/public/images/message/';
+                        $media->moveTo($destinationPath.$newFileName);
+
+                        $message_text = $newFileName;
+                        $m = new Message();
+                        $link = $m->getMessageMediaLink($newFileName);
+
+                        $uploaded = true;
+                    }
+                    else{
+                        $messageJson = "Extension non autorisée";
+                    }
+                }
+                else{
+                    $messageJson = "Max taille fichier : " . (string)$maxSize . " (octet)";
+                }
+            }
+            else {
+                if ($media){
+                    $messageJson = "Error code : " . (string)$media->getError();
+                }
+                else{
+                    $messageJson = "Fichier inexistant";
+                }
+            }
+        }
+        else {
+            $uploaded = true;
+        }
+
+        $status = $uploaded ? "success" : "error";
+
+        if ($uploaded){
+            $message = new Message();
+            $message->setMsg_text($message_text);
+            $message->setType($message_type);
+            $message->setUser_id($user_id);
+            $message->setDiscussion_id($discu_id);
+            $message->create();
+
+            $discussion = new Discussion();
+            $discussion->setId($discu_id);
+            $discussion->load();
+            $discussion->setLast_message($message->getId());
+            $discussion->update();
+
+            $message_user = $message->getArrayVersion();
+            $message_user["link"] = $link; 
+        }
 
         return $this->renderJson(array(
             "status" => $status,
@@ -146,27 +202,82 @@ class DiscussionController extends BaseController
         $message_text = $this->getRequestBody($request, 'message');
         $message_type = $this->getRequestBody($request, 'type');
 
-        $discussion = new Discussion();
-        $discu_id = $discussion->getDiscuIdFromProfil($user_id, $user_to_send);
-
-        $message = new Message();
-        $message->setMsg_text($message_text);
-        $message->setType($message_type);
-        $message->setUser_id($user_id);
-        $message->setDiscussion_id($discu_id);
-        $message->create();
-
-        $discussion->setId($discu_id);
-        $discussion->load();
-        $discussion->setLast_message($message->getId());
-        $discussion->update();
-
         $status = "success";
         $messageJson = "Message sent";
+        $message_user = null;
+        $discu_id = null;
+        $link = null;
+
+        $uploaded = false;
+
+        $maxSize = 1000000; //octet
+
+        if ($message_type == "media"){
+            $media = $this->getUploadedFiles($request, 'media');
+
+            if ($media AND $media->getError() == 0){
+                if ($media->getSize() <= $maxSize){
+                    $infosFichier = pathinfo($media->getClientFileName());
+                    $extension = $infosFichier['extension'];
+                    $extensionsAuorisees = array('jpg','jpeg','gif','png');
+                    if (in_array($extension, $extensionsAuorisees)){
+                        $newFileName = 'm' . $user_id . date('YmdHis') . '.' . $extension;
+                        $destinationPath = $_SERVER['DOCUMENT_ROOT'] . '/simple-chat/public/images/message/';
+                        $media->moveTo($destinationPath.$newFileName);
+
+                        $message_text = $newFileName;
+                        $m = new Message();
+                        $link = $m->getMessageMediaLink($newFileName);
+
+                        $uploaded = true;
+                    }
+                    else{
+                        $messageJson = "Extension non autorisée";
+                    }
+                }
+                else{
+                    $messageJson = "Max taille fichier : " . (string)$maxSize . " (octet)";
+                }
+            }
+            else {
+                if ($media){
+                    $messageJson = "Error code : " . (string)$media->getError();
+                }
+                else{
+                    $messageJson = "Fichier inexistant";
+                }
+            }
+        }
+        else {
+            $uploaded = true;
+        }
+
+        $status = $uploaded ? "success" : "error";
+
+        if ($uploaded){
+            $discussion = new Discussion();
+            $discu_id = $discussion->getDiscuIdFromProfil($user_id, $user_to_send);
+
+            $message = new Message();
+            $message->setMsg_text($message_text);
+            $message->setType($message_type);
+            $message->setUser_id($user_id);
+            $message->setDiscussion_id($discu_id);
+            $message->create();
+
+            $message_user = $message->getArrayVersion();
+
+            $discussion->setId($discu_id);
+            $discussion->load();
+            $discussion->setLast_message($message->getId());
+            $discussion->update();
+        }
 
         return $this->renderJson(array(
             "status" => $status,
-            "message" => $messageJson
+            "message" => $messageJson,
+            "message_user" => $message_user,
+            "discussion_id" => $discu_id,
         ));
     }
 

@@ -353,7 +353,7 @@ class UserRepository extends UserEntity{
 			ON u.id=d.send_id
 			WHERE receive_id=?
 			AND d.actif=TRUE
-			AND d.is_accepted=NULL
+			AND d.is_accepted IS NULL
 			ORDER BY d.date_envoi DESC
 		");
 		$req->execute(array($id));
@@ -378,6 +378,7 @@ class UserRepository extends UserEntity{
 				$userArray["id"] = $userO->getId();
 				$userArray["pseudo"] = $userO->getPseudo();
 				$userArray["photo_profil"] = $userO->getPhoto_profil();
+				$userArray["photo_link"] = $userO->getPhotoInfo($userO->getPhoto_profil());
 				$userArray["bio"] = $userO->getBio();
 				$userArray["actif"] = $userO->getActif();
 				$usersArray[] = $userArray;
@@ -525,6 +526,57 @@ class UserRepository extends UserEntity{
 		else {
 			return true;
 		}
+	}
+
+	public function getArrayVersion(){
+		$req = $this->db->prepare("SELECT * FROM user WHERE 
+			id=? 
+		");
+		$req -> execute(array(
+			$this->getId(),
+		));
+		$user = $req->fetch();
+		$userArray = array();
+		foreach ($user as $key => $value) {
+			if ($key != "0" AND (int)$key == 0){
+				$userArray[$key] = $value;
+			}
+		}
+		return $userArray;
+	}
+
+	public function getListContact($user_id){
+		$req = $this->db->prepare("
+			SELECT u.* FROM user u
+			INNER JOIN contact c
+			ON u.id=c.friend_id
+			WHERE c.user_id=?
+			ORDER BY u.pseudo ASC
+		");
+		$req->execute(array(
+			$user_id,
+		));
+
+		$userArray = array();
+		while ($friend = $req->fetch()){
+			$user = new UserRepository();
+			$user->setId($friend["id"]);
+			$uArr = $user->getArrayVersion();
+			unset($uArr["password"]);
+			$uArr["photo_info"] = $user->getPhotoInfo($uArr["photo_profil"]);
+			$userArray[] = $uArr;
+		}
+		return $userArray;
+	}
+
+	public function getNbFriends($user_id){
+		$req = $this->db->prepare("
+			SELECT COUNT(id) as nb FROM contact 
+			WHERE user_id=?
+		");
+		$req->execute(array($user_id));
+		$nb = $req->fetch();
+		return (int)$nb['nb'];
 	}
 
 }

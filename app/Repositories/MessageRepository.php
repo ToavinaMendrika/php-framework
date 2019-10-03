@@ -146,9 +146,11 @@ class MessageRepository extends MessageEntity{
 		$userArray = $req->fetch();
 
 		$user = array();
+		$userObj = new UserRepository();
 		$user["id"] = $userArray["user_id"];
 		$user["pseudo"] = $userArray["pseudo"];
 		$user["photo_profil"] = $userArray["photo_profil"];
+		$user["photo_info"] = $userObj->getPhotoInfo($userArray["photo_profil"]);
 
 		return $user;
 	}
@@ -189,5 +191,13 @@ class MessageRepository extends MessageEntity{
 		$req->execute(array($user_id, $discu_id));
 		$count = $req->rowCount();
 		return $count;
+	}
+
+	public function getMessageMediaLink($media_name=null){
+		if ($media_name == null){
+			return null;
+		}
+		$link = $_SERVER['APP_URL'] . '/simple-chat/public/images/message/' . $media_name;
+		return $link;
 	}
 }
