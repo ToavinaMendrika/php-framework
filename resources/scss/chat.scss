@@ -43,21 +43,6 @@ main{
                 position: relative;
                 align-items: center;
                 width: 17%;
-                .not-read{
-                    &.nbr-0{
-                        display: none;
-                    }
-                    display: block;
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    color: #fff;
-                    font-weight: bold;
-                    padding: 2px;
-                    background: #e74c3c;
-                    border-radius: 2px;
-                    font-size: 12px;
-                }
                 img{
                     display: block;
                     border-radius: 8px;
@@ -181,4 +166,19 @@ main{
 .search-wrapper{
     width: 80%;
     margin: 30px auto 0;
+}
+.not-read{
+    &.nbr-0{
+        display: none;
+    }
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #fff;
+    font-weight: bold;
+    padding: 2px;
+    background: #e74c3c;
+    border-radius: 2px;
+    font-size: 12px;
 }

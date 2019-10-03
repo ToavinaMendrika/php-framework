@@ -15204,23 +15204,6 @@ main .discussion .discussion-card .avatar {
   width: 17%;
 }
 
-main .discussion .discussion-card .avatar .not-read {
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  color: #fff;
-  font-weight: bold;
-  padding: 2px;
-  background: #e74c3c;
-  border-radius: 2px;
-  font-size: 12px;
-}
-
-main .discussion .discussion-card .avatar .not-read.nbr-0 {
-  display: none;
-}
-
 main .discussion .discussion-card .avatar img {
   display: block;
   border-radius: 8px;
@@ -15358,5 +15341,22 @@ main .about .avatar {
 .search-wrapper {
   width: 80%;
   margin: 30px auto 0;
+}
+
+.not-read {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #fff;
+  font-weight: bold;
+  padding: 2px;
+  background: #e74c3c;
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.not-read.nbr-0 {
+  display: none;
 }
 

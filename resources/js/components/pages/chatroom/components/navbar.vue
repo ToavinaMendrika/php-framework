@@ -17,7 +17,9 @@
             <div class="navbar-start">
                 <router-link :to="{name: 'chat_home'}" class="navbar-item">Home</router-link>
                 <router-link :to="{name: 'chat_contacts'}" class="navbar-item">Contacts</router-link>   
-                <router-link :to="{name: 'chat_invitation'}" class="navbar-item">Invitation</router-link>   
+                <router-link :to="{name: 'chat_invitation'}" class="navbar-item">Invitation
+                    <span :class="'not-read nbr-' + nbrRequest" v-show="nbrRequest > 0">{{ nbrRequest }}</span>
+                </router-link>   
             </div>
         
             <div class="navbar-end">
@@ -51,7 +53,8 @@
         store: store,
         data(){
             return {
-                currentUser : {}
+                currentUser : {},
+                nbrRequest: 0
             }
         },
         mounted(){
@@ -67,13 +70,54 @@
            .catch(function (error) {
                console.log(error);
            });
+           this.getAllRequest()
         },
         methods:{
             logout(){
                 store.dispatch('clean')
                 window.localStorage.removeItem('token')
                 this.$router.push({name: 'login'})
+            },
+            getAllRequest(){
+           
+                let uri = '/user/request/all'
+                axios.post(uri, {},{
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': window.localStorage.getItem('token') 
+                    }
+                })
+                .then((response)=>  {
+                    if(response.status == 200){                    
+                        this.nbrRequest = response.data.nb_not_seen
+                    }
+                }) 
+                
+            },
+            
+            seenAllRequest(){
+                let uri = '/user/request/seen'
+                axios.post(uri, {},{
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Authorization': window.localStorage.getItem('token') 
+                    }
+                })
+                .then((response)=>  {
+                    if(response.status == 200){
+                        this.nbrRequest = 0
+                    }
+                }) 
             }
-        }
+        },
+        watch:{
+            $route (to, from){
+                if(this.$route.name == 'chat_invitation'){
+                    if(this.nbrRequest > 0){
+                        this.seenAllRequest()
+                    }
+                }
+            }
+        }  
     }
 </script>

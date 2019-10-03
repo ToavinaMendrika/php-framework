@@ -2802,13 +2802,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   store: _store_discussionStore__WEBPACK_IMPORTED_MODULE_1__["default"],
   data: function data() {
     return {
-      currentUser: {}
+      currentUser: {},
+      nbrRequest: 0
     };
   },
   mounted: function mounted() {
@@ -2824,6 +2827,7 @@ __webpack_require__.r(__webpack_exports__);
     })["catch"](function (error) {
       console.log(error);
     });
+    this.getAllRequest();
   },
   methods: {
     logout: function logout() {
@@ -2832,6 +2836,45 @@ __webpack_require__.r(__webpack_exports__);
       this.$router.push({
         name: 'login'
       });
+    },
+    getAllRequest: function getAllRequest() {
+      var _this2 = this;
+
+      var uri = '/user/request/all';
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(uri, {}, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': window.localStorage.getItem('token')
+        }
+      }).then(function (response) {
+        if (response.status == 200) {
+          _this2.nbrRequest = response.data.nb_not_seen;
+        }
+      });
+    },
+    seenAllRequest: function seenAllRequest() {
+      var _this3 = this;
+
+      var uri = '/user/request/seen';
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(uri, {}, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': window.localStorage.getItem('token')
+        }
+      }).then(function (response) {
+        if (response.status == 200) {
+          _this3.nbrRequest = 0;
+        }
+      });
+    }
+  },
+  watch: {
+    $route: function $route(to, from) {
+      if (this.$route.name == 'chat_invitation') {
+        if (this.nbrRequest > 0) {
+          this.seenAllRequest();
+        }
+      }
     }
   }
 });
@@ -45515,7 +45558,24 @@ var render = function() {
                     staticClass: "navbar-item",
                     attrs: { to: { name: "chat_invitation" } }
                   },
-                  [_vm._v("Invitation")]
+                  [
+                    _vm._v("Invitation\n                "),
+                    _c(
+                      "span",
+                      {
+                        directives: [
+                          {
+                            name: "show",
+                            rawName: "v-show",
+                            value: _vm.nbrRequest > 0,
+                            expression: "nbrRequest > 0"
+                          }
+                        ],
+                        class: "not-read nbr-" + _vm.nbrRequest
+                      },
+                      [_vm._v(_vm._s(_vm.nbrRequest))]
+                    )
+                  ]
                 )
               ],
               1
