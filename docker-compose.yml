@@ -10,6 +10,18 @@ services:
       - 80:80
     depends_on:
       - db
+  nodejs:
+    image: node:alpine
+    volumes:
+      - ./nodejs:/app
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - web
+    ports:
+      - 3000:3000
+    command: npm run dev
   db:
     image: mysql:5.7
     restart: always
