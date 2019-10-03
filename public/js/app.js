@@ -2515,17 +2515,21 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
+
+
+var qs = __webpack_require__(/*! querystring */ "./node_modules/querystring-es3/index.js");
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   store: _store_discussionStore__WEBPACK_IMPORTED_MODULE_1__["default"],
   data: function data() {
     return {
-      contacts: [{
-        id: 25,
-        pseudo: 'test'
-      }]
+      contacts: []
     };
+  },
+  mounted: function mounted() {
+    this.getAllContacts();
   },
   methods: {
     sendMessageTo: function sendMessageTo(contact) {
@@ -2565,6 +2569,20 @@ __webpack_require__.r(__webpack_exports__);
           }
         });
       }
+    },
+    getAllContacts: function getAllContacts() {
+      var _this = this;
+
+      var uri = '/user_profil/list_contact/self';
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(uri, {
+        headers: {
+          'Authorization': window.localStorage.getItem('token')
+        }
+      }).then(function (response) {
+        if (response.data.status == 'success') {
+          _this.contacts = response.data.list_contact;
+        }
+      });
     }
   }
 });
@@ -45261,7 +45279,30 @@ var render = function() {
             return _c("div", { staticClass: "column is-4" }, [
               _c("div", { staticClass: "box" }, [
                 _c("article", { staticClass: "media" }, [
-                  _vm._m(0, true),
+                  _c("div", { staticClass: "media-left" }, [
+                    _c("figure", { staticClass: "image is-64x64" }, [
+                      contact.photo_profil == null
+                        ? _c("img", {
+                            staticClass: "is-rounded",
+                            staticStyle: { display: "inline-block" },
+                            attrs: {
+                              src:
+                                "https://api.adorable.io/avatars/45/" +
+                                contact.pseudo +
+                                "@adorable.png"
+                            }
+                          })
+                        : _vm._e(),
+                      _vm._v(" "),
+                      contact.photo_profil != null
+                        ? _c("img", {
+                            staticClass: "is-rounded",
+                            staticStyle: { display: "inline-block" },
+                            attrs: { src: contact.photo_profil }
+                          })
+                        : _vm._e()
+                    ])
+                  ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "media-content" }, [
                     _c("div", { staticClass: "content" }, [
@@ -45286,7 +45327,7 @@ var render = function() {
                             }
                           },
                           [
-                            _vm._m(1, true),
+                            _vm._m(0, true),
                             _vm._v(" "),
                             _c("span", [_vm._v("Message")])
                           ]
@@ -45305,21 +45346,6 @@ var render = function() {
   ])
 }
 var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "media-left" }, [
-      _c("figure", { staticClass: "image is-64x64" }, [
-        _c("img", {
-          attrs: {
-            src: "https://bulma.io/images/placeholders/128x128.png",
-            alt: "Image"
-          }
-        })
-      ])
-    ])
-  },
   function() {
     var _vm = this
     var _h = _vm.$createElement

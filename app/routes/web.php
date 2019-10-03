@@ -115,4 +115,4 @@ $router->post('/user_profil/editPhoto', 'UserController@editUserPhoto');
 * Authorization: jwt
 * user_id: user id of the user for getting his contact list ("self" for current user)
 */
-$router->get('/user_profil/list_contact', 'UserController@listContact');
+$router->get('/user_profil/list_contact/{id}', 'UserController@listContact');

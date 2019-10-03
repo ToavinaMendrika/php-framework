@@ -11,7 +11,8 @@
                             <article class="media">
                                 <div class="media-left">
                                     <figure class="image is-64x64">
-                                        <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image">
+                                        <img v-if="contact.photo_profil == null" class="is-rounded"  style="display:inline-block" :src="'https://api.adorable.io/avatars/45/' +contact.pseudo+'@adorable.png'">
+                                        <img v-if="contact.photo_profil != null" class="is-rounded"  style="display:inline-block" :src="contact.photo_profil">
                                     </figure>
                                 </div>
                                 <div class="media-content">
@@ -44,17 +45,16 @@
 <script>
     import axios from 'axios'
     import store from '../../../../store/discussionStore'
+     const qs = require('querystring')
     export default {
         store: store,
         data() {
             return {
-                contacts: [
-                    {
-                        id: 25,
-                        pseudo: 'test',
-                    }
-                ]
+                contacts: []
             }
+        },
+        mounted(){
+            this.getAllContacts()
         },
         methods:{
             sendMessageTo(contact){
@@ -91,6 +91,19 @@
                         params: {id: discussion.id}
                     })
                 }
+            },
+            getAllContacts(){
+                let uri = '/user_profil/list_contact/self'
+                 axios.get(uri,{
+                    headers: {
+                        'Authorization': window.localStorage.getItem('token')
+                    }
+                })
+                .then((response)=>  {
+                    if(response.data.status == 'success'){
+                        this.contacts = response.data.list_contact
+                    }
+                })
             }
         }
     }
