@@ -28,6 +28,10 @@ const store = new Vuex.Store({
                     discussion.notseen = 0
                 }
             })
+        },
+
+        clean(state){
+            state.discussions = []
         }
     },
     actions: {
@@ -78,6 +82,10 @@ const store = new Vuex.Store({
 
         addDiscussion(context, discussion){
             context.commit('addDiscussion', discussion)
+        }, 
+
+        clean(context){
+            context.commit('clean')
         }
 
     }

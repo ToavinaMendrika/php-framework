@@ -17,6 +17,7 @@
             <div class="navbar-start">
                 <router-link :to="{name: 'chat_home'}" class="navbar-item">Home</router-link>
                 <router-link :to="{name: 'chat_contacts'}" class="navbar-item">Contacts</router-link>   
+                <router-link :to="{name: 'chat_invitation'}" class="navbar-item">Invitation</router-link>   
             </div>
         
             <div class="navbar-end">
@@ -45,7 +46,9 @@
 </template>
 <script>
     import axios from 'axios'
+    import store from '../../../../store/discussionStore'
     export default {
+        store: store,
         data(){
             return {
                 currentUser : {}
@@ -67,6 +70,7 @@
         },
         methods:{
             logout(){
+                store.dispatch('clean')
                 window.localStorage.removeItem('token')
                 this.$router.push({name: 'login'})
             }

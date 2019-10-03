@@ -127,7 +127,7 @@
                             if (response.data.status == 'success') {
                                 this.message.display = true,
                                 this.message.type = 'is-success',
-                                this.message.text = response.data.token
+                                this.message.text = 'Bienvenue sur simple chat, connectez vouz pour comencer'
                                 this.username = ''
                                 this.pass = ''
                                 this.confirmPass = ''

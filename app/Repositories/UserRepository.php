@@ -305,6 +305,7 @@ class UserRepository extends UserEntity{
 			ON u.id=d.send_id
 			WHERE receive_id=?
 			AND d.actif=TRUE
+			AND d.is_accepted IS NULL
 			ORDER BY d.date_envoi DESC
 		");
 		$req->execute(array($id));
