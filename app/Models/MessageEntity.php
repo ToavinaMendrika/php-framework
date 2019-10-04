@@ -2,6 +2,11 @@
 
 namespace App\Models;
 
+/**
+* Model MessageEntity
+*
+* @author David Rambolajaona <david.rambolajaon@esti.mg>
+*/
 class MessageEntity {
 	private $id;
 

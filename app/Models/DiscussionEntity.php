@@ -2,6 +2,11 @@
 
 namespace App\Models;
 
+/**
+* Model DiscussionEntity
+*
+* @author David Rambolajaona <david.rambolajaon@esti.mg>
+*/
 class DiscussionEntity {
 	private $id;
 
