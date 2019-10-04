@@ -551,7 +551,7 @@ class UserController extends BaseController
     * @param object $request
     * @return array
     */
-    public function listContact($request){
+    public function listContact($request, $id){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
             return new Response(401, ['Content-Type' => 'application/json'], json_encode(array(
@@ -563,7 +563,6 @@ class UserController extends BaseController
         $user_id = $userArray["id"];
 
         $user_id_contact_list = $id;
-        $user_id_contact_list = $this->getRequestBody($request, 'user_id');
         if ($user_id_contact_list == "self"){
             $user_id_contact_list = $user_id;
         }
