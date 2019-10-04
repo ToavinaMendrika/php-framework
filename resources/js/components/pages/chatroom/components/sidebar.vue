@@ -12,10 +12,8 @@
                 </span> 
                 <span :class="'not-read nbr-' + discussion.notseen" v-if="discussion.notseen !== '0'">{{ discussion.notseen }}</span>
               </div>
-              <div class="discussion-body">
-                <span v-for="user in discussion.users">
-                  <p v-if="user.id != discussions.current_user_id">{{ user.pseudo }}</p>
-                </span> 
+              <div class="discussion-body">               
+                  <p>{{ discussion.name }}</p>                
                 <small class="date">{{ discussion.last_message.date_envoi }}</small>               
               </div>
               <div class="status">

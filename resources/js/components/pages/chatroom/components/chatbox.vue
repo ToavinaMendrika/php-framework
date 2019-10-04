@@ -4,13 +4,8 @@
             <div class="column">
           <div class="bordered messages">
             <div class="header">
-              <span v-for="avatar in current_discussion.avatars">
-                <img class="avatar" :src="avatar" alt="">
-              </span>
               <span class="discussion-title">
-                <span v-for="user in current_discussion.users" v-if="!user.is_current_user">
-                    {{user.pseudo}}
-                </span>
+                {{current_discussion[0].name}}
               </span>
             </div>
             <div class="message-box" id="message-box">
@@ -77,10 +72,11 @@
                 current_user: null,
                 other_user: null,
                 messages: [],
-                current_discussion: {
-                    users: [],
-                    avatars: []
-                }
+                current_discussion: [
+                  {
+                    name: 'chargement ...'
+                  }
+                ]
             }
         },
         created(){
@@ -97,9 +93,6 @@
               }
             }
         },
-        mounted(){
-            
-        },
         methods: {
             getMessages(discussionId){
                 let uri = '/chat/discussion/' + discussionId
@@ -113,37 +106,13 @@
                     this.messages = response.data.messages
                     this.current_user = response.data.current_user_id
                     this.newMessage.user.id = response.data.current_user_id
-                    this.current_discussion.users = []
-                    this.current_discussion.avatars = []
+                    this.current_discussion =  this.$store.getters.getDiscussionById(discussionId)
                     window.setTimeout( ()=>{
                         document.getElementById('message-box').scrollTop = document.getElementById('message-box').scrollHeight
                         this.seenMessage(discussionId)
                     },1000)
                     let current_user = []
-                    response.data.messages.forEach((message) =>{
-                        if(!current_user.includes(message.user.id)){
-                          current_user.push(message.user.id)
-                          let user = {
-                            is_current_user: message.user.id == this.current_user,
-                            ...message.user
-                          }
-                          if(!user.is_current_user){
-                            this.other_user = user.id
-                          }
-                          this.current_discussion.users.push(user)
-                        }
-                       
-                        
-                        /*
-                        if(!this.current_discussion.avatars.includes(avatar) || !this.current_discussion.avatars.includes(defaultAvatar)  && avatar !== null){
-                            this.current_discussion.avatars.push(avatar)
-                        }
-                        else{          
-                            this.current_discussion.avatars.push(defaultAvatar)
-                        }*/
-                    })
-                    console.log(this.current_discussion)
-                    console.log(this.other_user)
+                    
                 })
             },
 
@@ -171,7 +140,13 @@
                 .then((response)=>  {
                         this.newMessage.message = ''
                         document.getElementById('message-box').scrollTop = document.getElementById('message-box').scrollHeight
-                        
+                        if(this.$route.params.id == 'new'){
+                          this.$router.push({
+                            name: 'chat_box', 
+                            params: { id: response.data.discussion_id}
+                          })
+                          store.dispatch('updateDiscussion', response.data.discussion_id)
+                        }
                 })
             },
 

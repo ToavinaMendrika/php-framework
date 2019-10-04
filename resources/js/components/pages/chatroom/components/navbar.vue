@@ -51,6 +51,7 @@
     import store from '../../../../store/discussionStore'
     export default {
         store: store,
+        /*
         sockets: {
             connect: function () {
                 console.log('socket connected')
@@ -58,7 +59,7 @@
             customEmit: function (data) {
                 console.log('this method was fired by the socket server. eg: io.emit("customEmit", data)')
             }
-        },
+        },*/
         data(){
             return {
                 currentUser : {},
@@ -74,7 +75,7 @@
            .then((response)=>  {
               this.currentUser = response.data.user
               console.log(this.currentUser)
-              this.$socket.emit('user_connection', this.currentUser)
+              //this.$socket.emit('user_connection', this.currentUser)
            })
            .catch(function (error) {
                console.log(error);

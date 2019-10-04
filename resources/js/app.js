@@ -9,7 +9,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import router from './components/routes/router'
-import VueSocketIO from 'vue-socket.io'
+//import VueSocketIO from 'vue-socket.io'
 import store from './store/discussionStore'
 //import App from './components/App'
 
@@ -19,6 +19,7 @@ Vue.component('datacar', require('./components/Datacar.vue'));*/
 
 //Vue.component('app', require('./components/App.vue'))
 Vue.use(VueRouter)
+/*
 Vue.use(new VueSocketIO({
   debug: true,
   connection: 'http://localhost:3000',
@@ -27,7 +28,7 @@ Vue.use(new VueSocketIO({
       actionPrefix: 'SOCKET_',
       mutationPrefix: 'SOCKET_'
   }
-}))
+}))*/
 
 //const store = require('./store/discussionStore')
 const app = new Vue({
