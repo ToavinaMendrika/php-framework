@@ -2410,6 +2410,8 @@ var qs = __webpack_require__(/*! querystring */ "./node_modules/querystring-es3/
           });
 
           _store_discussionStore__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch('updateDiscussion', response.data.discussion_id);
+        } else {
+          _store_discussionStore__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch('moveTofirstPosition', response.data.discussion_id);
         }
       });
     },
@@ -63098,6 +63100,12 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_0__["default"].Store({
         }
       });
     },
+    moveTofirstPosition: function moveTofirstPosition(state, discussionId) {
+      var first = discussionId;
+      state.discussions.discussions.sort(function (x, y) {
+        return x.id == first ? -1 : y.id == first ? 1 : 0;
+      });
+    },
     clean: function clean(state) {
       state.discussions = [];
     }
@@ -63151,6 +63159,9 @@ var store = new vuex__WEBPACK_IMPORTED_MODULE_0__["default"].Store({
     },
     updateDiscussion: function updateDiscussion(context, discussionId) {
       context.commit('updateDiscussion', discussionId);
+    },
+    moveTofirstPosition: function moveTofirstPosition(context, discussionId) {
+      context.commit('moveTofirstPosition', discussionId);
     },
     clean: function clean(context) {
       context.commit('clean');

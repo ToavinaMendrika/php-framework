@@ -44,6 +44,11 @@ const store = new Vuex.Store({
             })
         },
 
+        moveTofirstPosition(state, discussionId){
+            var first = discussionId
+            state.discussions.discussions.sort(function(x,y){ return x.id == first ? -1 : y.id == first ? 1 : 0; });
+        },
+
         clean(state){
             state.discussions = []
         }
@@ -105,6 +110,10 @@ const store = new Vuex.Store({
 
         updateDiscussion(context, discussionId){
             context.commit('updateDiscussion', discussionId)
+        },
+
+        moveTofirstPosition(context, discussionId){
+            context.commit('moveTofirstPosition', discussionId)
         },
         clean(context){
             context.commit('clean')

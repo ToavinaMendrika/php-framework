@@ -147,6 +147,9 @@
                           })
                           store.dispatch('updateDiscussion', response.data.discussion_id)
                         }
+                        else{
+                          store.dispatch('moveTofirstPosition', response.data.discussion_id)
+                        }
                 })
             },
 
