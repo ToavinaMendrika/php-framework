@@ -5,7 +5,18 @@ namespace App\Repositories;
 use App\Models\UserEntity;
 use Framework\Database\Connection;
 
+/**
+* Repository DiscussionRepository
+*
+* @author David Rambolajaona <david.rambolajaon@esti.mg>
+*/
 class UserRepository extends UserEntity{
+
+	/**
+	* PDO
+	*
+	* @var object
+	*/
 	private $db = null;
 
 	function __construct(){

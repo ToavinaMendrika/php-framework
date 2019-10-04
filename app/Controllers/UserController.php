@@ -7,9 +7,19 @@ use App\Repositories\UserRepository as User;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Psr7\Response;
 
+/**
+* Description of UserController
+*
+* @author David Rambolajaona <david.rambolajaon@esti.mg>
+*/
 class UserController extends BaseController
 {
-
+    /**
+    * Verify if a token exists in the header
+    *
+    * @param object $request
+    * @return array|bool
+    */
     protected function verify_token($request)
     {
         $header = $request->getHeaders();
@@ -24,6 +34,13 @@ class UserController extends BaseController
         }
     }
 
+    /**
+    * Register a new user
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function register(Request $request){
 
         $user = new User();
@@ -59,6 +76,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Login of an user
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function login(Request $request){
         $user = new User();
         $user->setEmail($this->getRequestBody($request,'email'));
@@ -92,6 +116,14 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Information about an user
+    *
+    * @api
+    * @param object $request
+    * @param int|string $id
+    * @return array
+    */
     public function userAbout($request, $id){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -142,6 +174,13 @@ class UserController extends BaseController
         }
     }
 
+    /**
+    * List of users that are result of the search
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function search($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -192,6 +231,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Sending a friend request to an user or deleting the user from the contact
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function addUser($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -214,6 +260,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * List of users who sent a request to the current user
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function allUsersFromRequest($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -238,6 +291,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Make the requests seen by the current user
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function seeRequests($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -263,6 +323,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Accepting or refusing a request by the current user
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function responseRequest($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -303,6 +370,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Updating the information of the current user like pseudo, password, bio
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function editUser($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -365,6 +439,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Verify if the current user's password matches with the sent one
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function verifyPassword($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -387,6 +468,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Update the current user's profil picture
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function editUserPhoto($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -456,6 +544,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * List of the user's contact
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function listContact($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -487,6 +582,13 @@ class UserController extends BaseController
         ));
     }
 
+    /**
+    * Getting an encoded string jwt
+    *
+    * @param array $data
+    * @param string $key
+    * @return string
+    */
     public function getEncodeJwt($data, $key){
         // $tokenId    = base64_encode(mcrypt_create_iv(32));
         $issuedAt   = time();
@@ -509,6 +611,13 @@ class UserController extends BaseController
         return $jwt;
     }
 
+    /**
+    * Getting the decoded object of a jwt string
+    *
+    * @param string $jwt
+    * @param string $key
+    * @return object
+    */
     public function getDecodeJwt($jwt, $key){
         $decoded = JWT::decode($jwt, $key, array('HS256'));
         return $decoded;

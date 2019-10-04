@@ -8,10 +8,19 @@ use App\Repositories\MessageRepository as Message;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Psr7\Response;
 
+/**
+* Description of MessageController
+*
+* @author David Rambolajaona <david.rambolajaon@esti.mg>
+*/
 class MessageController extends BaseController
 {
-    private $key = "example";
-
+    /**
+    * Verify if a token exists in the header
+    *
+    * @param object $request
+    * @return array|bool
+    */
     protected function verify_token($request)
     {
         $header = $request->getHeaders();
@@ -26,6 +35,13 @@ class MessageController extends BaseController
         }
     }
 
+    /**
+    * Make the messages seen by the current user in the discussion
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function seeMessages($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -51,6 +67,13 @@ class MessageController extends BaseController
         ));
     }
 
+    /**
+    * Getting an encoded string jwt
+    *
+    * @param array $data
+    * @param string $key
+    * @return string
+    */
     public function getEncodeJwt($data, $key){
         // $tokenId    = base64_encode(mcrypt_create_iv(32));
         $issuedAt   = time();
@@ -73,6 +96,13 @@ class MessageController extends BaseController
         return $jwt;
     }
 
+    /**
+    * Getting the decoded object of a jwt string
+    *
+    * @param string $jwt
+    * @param string $key
+    * @return object
+    */
     public function getDecodeJwt($jwt, $key){
         $decoded = JWT::decode($jwt, $key, array('HS256'));
         return $decoded;

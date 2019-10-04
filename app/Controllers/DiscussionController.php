@@ -8,10 +8,19 @@ use App\Repositories\MessageRepository as Message;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Psr7\Response;
 
+/**
+* Description of DiscussionController
+*
+* @author David Rambolajaona <david.rambolajaon@esti.mg>
+*/
 class DiscussionController extends BaseController
 {
-    private $key = "example";
-
+    /**
+    * Verify if a token exists in the header
+    *
+    * @param object $request
+    * @return array|bool
+    */
     protected function verify_token($request)
     {
         $header = $request->getHeaders();
@@ -26,6 +35,13 @@ class DiscussionController extends BaseController
         }
     }
 
+    /**
+    * List of user discussions
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function listDiscussion($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -61,6 +77,14 @@ class DiscussionController extends BaseController
         ));
     }
 
+    /**
+    * List of messages of the discussion
+    *
+    * @api
+    * @param object $request
+    * @param int|string $discu_id
+    * @return array
+    */
     public function discussion($request, $discu_id){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -98,6 +122,14 @@ class DiscussionController extends BaseController
         ));
     }
 
+    /**
+    * Sending a message in the discussion
+    *
+    * @api
+    * @param object $request
+    * @param int|string $discu_id
+    * @return array
+    */
     public function sendMessage($request, $discu_id){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -188,6 +220,13 @@ class DiscussionController extends BaseController
         ));
     }
 
+    /**
+    * Sending a message in the discussion from the profil of an user
+    *
+    * @api
+    * @param object $request
+    * @return array
+    */
     public function sendMessageFromProfil($request){
         $userArray = $this->verify_token($request);
         if ($userArray==false){
@@ -281,6 +320,13 @@ class DiscussionController extends BaseController
         ));
     }
 
+    /**
+    * Getting an encoded string jwt
+    *
+    * @param array $data
+    * @param string $key
+    * @return string
+    */
     public function getEncodeJwt($data, $key){
         // $tokenId    = base64_encode(mcrypt_create_iv(32));
         $issuedAt   = time();
@@ -303,6 +349,13 @@ class DiscussionController extends BaseController
         return $jwt;
     }
 
+    /**
+    * Getting the decoded object of a jwt string
+    *
+    * @param string $jwt
+    * @param string $key
+    * @return object
+    */
     public function getDecodeJwt($jwt, $key){
         $decoded = JWT::decode($jwt, $key, array('HS256'));
         return $decoded;

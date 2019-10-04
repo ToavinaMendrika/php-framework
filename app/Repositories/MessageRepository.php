@@ -5,7 +5,18 @@ namespace App\Repositories;
 use App\Models\MessageEntity;
 use Framework\Database\Connection;
 
+/**
+* Repository MessageRepository
+*
+* @author David Rambolajaona <david.rambolajaon@esti.mg>
+*/
 class MessageRepository extends MessageEntity{
+
+	/**
+	* PDO
+	*
+	* @var object
+	*/
 	private $db = null;
 
 	function __construct(){
