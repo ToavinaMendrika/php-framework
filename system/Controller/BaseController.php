@@ -28,7 +28,10 @@ class BaseController
     public function renderJson(array $data):ResponseInterface
     {
         return new Response(200,[
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Headers' => 'X-Requested-With, Content-Type, Accept, Origin, Authorization',
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
         ],json_encode($data));
     }
 

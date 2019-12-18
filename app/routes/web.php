@@ -27,6 +27,15 @@ $router->post('/user/login', 'UserController@login');
 /*
 * Authorization: jwt
 */
+
+$router->options('/.*', function($resquest){
+    return new Response(200,[
+        'Content-Type' => 'application/json',
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Headers' => 'X-Requested-With, Content-Type, Accept, Origin, Authorization',
+        'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
+    ]);
+});
 $router->get('/chat/discussion', 'DiscussionController@listDiscussion');
 
 /*
