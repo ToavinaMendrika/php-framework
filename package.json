@@ -39,7 +39,7 @@
     "cross-env": "^5.2.1",
     "emoji-mart-vue": "^2.6.6",
     "emojize": "^0.2.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "moment": "^2.24.0",
     "querystring": "^0.2.0",
     "vue": "^2.6.10",
